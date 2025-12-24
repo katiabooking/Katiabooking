@@ -221,12 +221,12 @@ git add .github/workflows/deploy.yml package-lock.json && git commit -m "🚀 De
 
 ### 🎉 ВСЕ ИСПРАВЛЕНИЯ ГОТОВЫ!
 
-✅ **package-lock.json создан** - решает "Dependencies lock file is not found"  
+✅ **npm install --legacy-peer-deps** - решает "lock file not in sync"  
 ✅ **Node.js 20.x** - решает "Unable to find Node version '20'"  
 ✅ **Environment variables** - добавлены в workflow  
 ✅ **--legacy-peer-deps** - решает конфликт React 18 vs React 19
 
-👉 **[FIX_REACT_CONFLICT.md](./FIX_REACT_CONFLICT.md)** - ⚡ **НОВОЕ ИСПРАВЛЕНИЕ!** React conflict fix
+👉 **[FINAL_FIX_NPM.md](./FINAL_FIX_NPM.md)** - ⚡ **ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ!** npm install fix
 
 ### 🔧 Документация по деплою:
 
@@ -272,7 +272,7 @@ git add .github/workflows/deploy.yml package-lock.json && git commit -m "🚀 De
 - 📱 Push уведомления
 
 ### Для владельцев салонов:
-- 📊 Аналитика и отчёты
+- 📊 Ана��итика и отчёты
 - 👥 Управление мастерами
 - 📅 Календарь записей
 - 💰 Управление ценами
