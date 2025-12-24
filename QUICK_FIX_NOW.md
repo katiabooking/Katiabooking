@@ -5,11 +5,13 @@
 1. ✅ **"Unable to find Node version '20'"** - Исправлена версия на `'20.x'`
 2. ✅ **"Dependencies lock file is not found"** - **Создан `package-lock.json`!**
 3. ✅ **Отсутствие environment variables** - Добавлена секция `env:`
+4. ✅ **"peer react@'^19.0.0' from react-leaflet"** - Добавлен `--legacy-peer-deps`
 
 📖 **Детали:**
 - 🔧 [NODE_VERSION_FIX.md](./NODE_VERSION_FIX.md) - Node.js версия
 - 📦 [PACKAGE_LOCK_SOLUTION.md](./PACKAGE_LOCK_SOLUTION.md) - **package-lock.json создан!**
 - 📋 [LOCK_FILE_FIX.md](./LOCK_FILE_FIX.md) - Lock file проблема (альтернатива)
+- ⚡ [FIX_REACT_CONFLICT.md](./FIX_REACT_CONFLICT.md) - **React 18/19 конфликт решён!**
 
 ---
 

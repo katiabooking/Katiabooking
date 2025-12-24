@@ -11,6 +11,29 @@
 
 ## 🚀 Быстрый старт
 
+### ⚡ ONE-CLICK PUSH В GITHUB:
+
+**После изменений в Figma Make, просто:**
+
+**Windows (двойной клик):**
+```
+push.bat
+```
+
+**Или PowerShell:**
+```powershell
+.\push.ps1
+```
+
+**Или npm (универсально):**
+```bash
+npm run git:deploy
+```
+
+📚 **Подробнее:** [AUTO_PUSH_GUIDE.md](./AUTO_PUSH_GUIDE.md) | ⚡ [QUICK_PUSH.md](./QUICK_PUSH.md)
+
+---
+
 ### Установка зависимостей:
 
 ```bash
@@ -200,9 +223,10 @@ git add .github/workflows/deploy.yml package-lock.json && git commit -m "🚀 De
 
 ✅ **package-lock.json создан** - решает "Dependencies lock file is not found"  
 ✅ **Node.js 20.x** - решает "Unable to find Node version '20'"  
-��� **Environment variables** - добавлены в workflow  
+✅ **Environment variables** - добавлены в workflow  
+✅ **--legacy-peer-deps** - решает конфликт React 18 vs React 19
 
-👉 **[ALL_FIXES_APPLIED.md](./ALL_FIXES_APPLIED.md)** - ✅ Полный список всех исправлений
+👉 **[FIX_REACT_CONFLICT.md](./FIX_REACT_CONFLICT.md)** - ⚡ **НОВОЕ ИСПРАВЛЕНИЕ!** React conflict fix
 
 ### 🔧 Документация по деплою:
 
