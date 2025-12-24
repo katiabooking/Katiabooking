@@ -71,6 +71,8 @@
     "sonner": "2.0.3",
     "tailwind-merge": "3.2.0",
     "tw-animate-css": "1.3.8",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "vaul": "1.1.2"
   },
   "devDependencies": {
@@ -79,13 +81,6 @@
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },
-  "dependencies": {
-  "@emotion/react": "11.14.0",
-  "@emotion/styled": "11.14.1",
-  "react": "18.3.1",
-  "react-dom": "18.3.1",
-  "react-day-picker": "8.10.1"
-},
 "pnpm": {
   "overrides": {
     "vite": "6.3.5"
