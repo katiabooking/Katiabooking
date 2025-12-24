@@ -1,0 +1,82 @@
+name: 🚀 Deploy to GitHub Pages
+
+on:
+  # Автоматический запуск при push в main/master
+  push:
+    branches: 
+      - main
+      - master
+  
+  # Позволяет запускать вручную из вкладки Actions
+  workflow_dispatch:
+
+# Разрешения для деплоя на GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Только один деплой одновременно
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🏗️ Build project
+        run: npm run build --legacy-peer-deps
+        env:
+          # ⚠️ КРИТИЧНО: Добавьте environment variables как GitHub Secrets
+          # Settings → Secrets and variables → Actions → New repository secret
+          
+          # Supabase (ОБЯЗАТЕЛЬНО)
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          
+          # Stripe (если используете)
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          
+          # Google Maps (если используете)
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+
+      - name: 📤 Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  # Deploy job
+  deploy:
+    name: 🚀 Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: ✅ Deployment complete
+        run: |
+          echo "🎉 Deployment successful!"
+          echo "🌐 Your site is live at: ${{ steps.deployment.outputs.page_url }}"
