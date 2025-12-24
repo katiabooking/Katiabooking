@@ -1,5 +1,5 @@
 import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 import App from './app/App';
 import { ErrorBoundary } from './app/components/ErrorBoundary';
 import './styles/index.css';
@@ -23,10 +23,26 @@ if (!rootElement) {
 console.log('✅ Root element found:', rootElement.id);
 console.log('📍 Location:', window.location.href);
 
-createRoot(rootElement).render(
+// FIX: Сохраняем root instance для переиспользования
+declare global {
+  interface Window {
+    __REACT_ROOT__?: Root;
+  }
+}
+
+const appComponent = (
   <StrictMode>
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
   </StrictMode>
 );
+
+// Используем существующий root или создаем новый
+if (!window.__REACT_ROOT__) {
+  window.__REACT_ROOT__ = createRoot(rootElement);
+  console.log('✅ Creating new React root');
+}
+
+window.__REACT_ROOT__.render(appComponent);
+console.log('✅ App rendered successfully');

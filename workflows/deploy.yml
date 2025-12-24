@@ -1,60 +1,82 @@
-name: Deploy to GitHub Pages
+name: 🚀 Deploy to GitHub Pages
 
 on:
+  # Автоматический запуск при push в main/master
   push:
-    branches:
-      - main  # Измените на ваш основной branch (main или master)
-
+    branches: 
+      - main
+      - master
+  
   # Позволяет запускать вручную из вкладки Actions
   workflow_dispatch:
 
-# Устанавливаем разрешения для GitHub Pages
+# Разрешения для деплоя на GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Разрешаем только один одновременный деплой
+# Только один деплой одновременно
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Сборка проекта
+  # Build job
   build:
+    name: 🏗️ Build
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: 🟢 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: npm ci
 
-      - name: Build project
+      - name: 🏗️ Build project
         run: npm run build
+        env:
+          # ⚠️ КРИТИЧНО: Добавьте environment variables как GitHub Secrets
+          # Settings → Secrets and variables → Actions → New repository secret
+          
+          # Supabase (ОБЯЗАТЕЛЬНО)
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          
+          # Stripe (если используете)
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          
+          # Google Maps (если используете)
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
+      - name: 📤 Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: ./dist
 
-  # Деплой на GitHub Pages
+  # Deploy job
   deploy:
+    name: 🚀 Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
+    
     steps:
-      - name: Deploy to GitHub Pages
+      - name: 🚀 Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: ✅ Deployment complete
+        run: |
+          echo "🎉 Deployment successful!"
+          echo "🌐 Your site is live at: ${{ steps.deployment.outputs.page_url }}"

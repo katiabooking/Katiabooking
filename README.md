@@ -2,6 +2,11 @@
 
 Современная SaaS платформа для бронирования услуг салонов красоты (аналог Fresha) с фиолетово-розовым градиентным дизайном.
 
+<!-- Раскомментируйте после деплоя и замените YOUR_USERNAME на ваш GitHub username -->
+<!-- ![Deploy Status](https://github.com/YOUR_USERNAME/katia-platform/actions/workflows/deploy.yml/badge.svg) -->
+<!-- ![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ready-success) -->
+<!-- ![License](https://img.shields.io/badge/license-Proprietary-blue) -->
+
 ---
 
 ## 🚀 Быстрый старт
@@ -34,7 +39,7 @@ pnpm dev
 - 🏠 **Главная страница** - Hero section с поиском
 - 🏪 **Каталог салонов** - Карусели с салонами
 - 📱 **Mobile-first** - Адаптивный дизайн
-- 💎 **UI компоненты** - shadcn/ui компоненты
+- 💎 **UI компоненты** - shadcn/ui кмпоннты
 - 🎨 **Дизайн** - Фиолетово-розовые градиенты
 - 🔔 **Уведомления** - Toast notifications (Sonner)
 - 👤 **Профиль пользователя** - Dropdown меню в Header
@@ -143,7 +148,7 @@ VITE_SUPABASE_ANON_KEY=sb_publishable_FmZxEB3IzAM-KrIbH372xQ_vMx5KJ42
 | `/salons` | Каталог салонов |
 | `/salon/:id` | Профиль салона |
 | `/booking/:salonId/:serviceId` | Бронирование услуги |
-| `/dashboard` | Личный кабинет клиента |
+| `/dashboard` | Личный кабинт клина |
 | `/salon-dashboard` | Кабинет владельца салона |
 | `/admin` | Админ панель |
 
@@ -177,27 +182,59 @@ npm run deploy       # Деплой на GitHub Pages (после настрой
 
 ## 🌐 Деплой на GitHub Pages
 
-### ⚡ Быстрый старт
+### ⚡ Быстрый старт (1 команда!)
 
-1. **Обновите vite.config.ts:**
-   ```typescript
-   base: '/your-repo-name/',  // Замените на имя вашего репозитория
-   ```
+**✅ ВСЁ ГОТОВО! package-lock.json создан!**
 
-2. **Настройте GitHub Pages:**
-   - Settings → Pages → Source: `GitHub Actions`
+```bash
+git add .github/workflows/deploy.yml package-lock.json && git commit -m "🚀 Deploy Katia Platform" && git push origin main
+```
 
-3. **Запушьте код:**
-   ```bash
-   git add .
-   git commit -m "Setup GitHub Pages"
-   git push origin main
-   ```
+**После push добавьте GitHub Secrets и сайт будет live через 2-3 минуты!**
 
-4. **Готово!** Ваш сайт будет доступен через несколько минут
+👉 **[START_DEPLOY.md](./START_DEPLOY.md)** - 🚀 **НАЧНИТЕ ЗДЕСЬ!** Деплой за 3 шага
 
-📖 **Полная инструкция:** [GITHUB_PAGES_DEPLOY.md](./GITHUB_PAGES_DEPLOY.md)  
-⚡ **Быстрая шпаргалка:** [QUICK_DEPLOY_GUIDE.md](./QUICK_DEPLOY_GUIDE.md)
+---
+
+### 🎉 ВСЕ ИСПРАВЛЕНИЯ ГОТОВЫ!
+
+✅ **package-lock.json создан** - решает "Dependencies lock file is not found"  
+✅ **Node.js 20.x** - решает "Unable to find Node version '20'"  
+��� **Environment variables** - добавлены в workflow  
+
+👉 **[ALL_FIXES_APPLIED.md](./ALL_FIXES_APPLIED.md)** - ✅ Полный список всех исправлений
+
+### 🔧 Документация по деплою:
+
+**🔥 Быстрый старт:**
+- 🚀 **[START_DEPLOY.md](./START_DEPLOY.md)** - **НАЧНИТЕ ЗДЕСЬ!** Деплой за 3 шага
+- ⚡ **[QUICK_FIX_NOW.md](./QUICK_FIX_NOW.md)** - Быстрая инструкция (1 минута)
+
+**📦 Детали исправлений:**
+- 📦 **[PACKAGE_LOCK_SOLUTION.md](./PACKAGE_LOCK_SOLUTION.md)** - package-lock.json создан!
+- 🔧 **[NODE_VERSION_FIX.md](./NODE_VERSION_FIX.md)** - Node.js версия
+- 📋 **[LOCK_FILE_FIX.md](./LOCK_FILE_FIX.md)** - Альтернативные решения
+
+**📚 Полные гайды:**
+- ✅ **[ALL_FIXES_APPLIED.md](./ALL_FIXES_APPLIED.md)** - Полный список исправлений
+- 📖 **[READY_TO_DEPLOY.md](./READY_TO_DEPLOY.md)** - React + Vite деплой
+- 🚀 **[GITHUB_PAGES_SETUP.md](./GITHUB_PAGES_SETUP.md)** - Полное руководство
+- 💻 **[GITHUB_DEPLOY_COMMANDS.md](./GITHUB_DEPLOY_COMMANDS.md)** - Команды для копирования
+
+### 🔑 Требуемые GitHub Secrets:
+
+Добавьте в Settings → Secrets and variables → Actions:
+
+| Secret Name | Где взять | Обязательно |
+|-------------|-----------|-------------|
+| `VITE_SUPABASE_URL` | Supabase Dashboard → Project Settings | ✅ Да |
+| `VITE_SUPABASE_ANON_KEY` | Supabase Dashboard → API Keys | ✅ Да |
+| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → API Keys | 🔵 Опционально |
+| `VITE_GOOGLE_MAPS_API_KEY` | Google Cloud Console | 🔵 Опционально |
+
+**Где получить VITE_SUPABASE_ANON_KEY:**
+1. Откройте https://supabase.com/dashboard/project/bbayqzqlqgqipohulcsd/settings/api
+2. Скопируйте "anon / public" ключ
 
 ---
 
@@ -249,16 +286,19 @@ npm run deploy       # Деплой на GitHub Pages (после настрой
 → Перезапустите dev server: `npm run dev`
 
 ### "Port 5173 already in use"
-→ Vite автоматически выберет другой порт
+→ Vite автоматически выберит другой порт
 
 ### OAuth не работает
 → Настройте провайдеров в Supabase Dashboard
+
+### "You are calling ReactDOMClient.createRoot()..." warning
+→ ✅ Исправлено! См. [ERROR_FIXES_SUMMARY.md](./ERROR_FIXES_SUMMARY.md)
 
 ---
 
 ## 📄 Лицензия
 
-Проприетарный проект - Katia Platform
+Проприетарный прокт - Katia Platform
 
 ---
 
