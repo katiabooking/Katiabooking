@@ -24,25 +24,37 @@ console.log('✅ Root element found:', rootElement.id);
 console.log('📍 Location:', window.location.href);
 
 // FIX: Сохраняем root instance для переиспользования
+// Предотвращает "createRoot() called twice" warning
 declare global {
   interface Window {
     __REACT_ROOT__?: Root;
   }
 }
 
-const appComponent = (
+// ИСПРАВЛЕНИЕ: StrictMode только в development
+// В production StrictMode может вызывать double render warnings
+const isDevelopment = import.meta.env.DEV;
+
+const appComponent = isDevelopment ? (
   <StrictMode>
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
   </StrictMode>
+) : (
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
 );
 
-// Используем существующий root или создаем новый
+// ИСПРАВЛЕНИЕ: Проверяем что root не был создан ранее
+// Это предотвращает React Double Render warning
 if (!window.__REACT_ROOT__) {
-  window.__REACT_ROOT__ = createRoot(rootElement);
   console.log('✅ Creating new React root');
+  window.__REACT_ROOT__ = createRoot(rootElement);
+  window.__REACT_ROOT__.render(appComponent);
+  console.log('✅ App rendered successfully');
+} else {
+  console.log('ℹ️ Reusing existing React root');
+  window.__REACT_ROOT__.render(appComponent);
 }
-
-window.__REACT_ROOT__.render(appComponent);
-console.log('✅ App rendered successfully');
