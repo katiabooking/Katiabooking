@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
 
       - name: 📥 Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: 🔍 ESLint check
         run: npm run lint
@@ -55,7 +55,7 @@ jobs:
           cache: 'npm'
 
       - name: 📥 Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: 🧪 Run auth tests only
         run: npx vitest run src/test/contexts/AuthContext.test.tsx
