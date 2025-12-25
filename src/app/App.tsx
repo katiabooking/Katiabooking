@@ -78,7 +78,8 @@ export default function App() {
     console.log('\n📦 Supabase Storage System:');
     console.log('   • Admin Panel: ' + window.location.origin + '/#/storage-admin');
     console.log('   • Demo Page: ' + window.location.origin + '/#/image-storage-demo');
-    console.log('   • Status: Ready for bucket initialization\n');
+    console.log('   • Status: Ready for bucket initialization');
+    console.log('   • Image Seeder: 30 demo images ready to upload\n');
   }, []);
 
   return (

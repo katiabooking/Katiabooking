@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Database, FolderOpen, Image, AlertCircle, CheckCircle } from 'lucide-react';
 import { projectId, publicAnonKey } from '../../utils/supabase/info';
+import { ImageSeeder } from './components/storage/ImageSeeder';
 
 interface BucketStatus {
   exists: boolean;
@@ -231,6 +232,11 @@ export default function StorageAdmin() {
               >
                 {initLoading ? 'Reinitializing...' : 'Reinitialize Bucket'}
               </button>
+            </div>
+
+            {/* Image Seeder */}
+            <div className="mt-8">
+              <ImageSeeder onUploadComplete={fetchStatus} />
             </div>
           </>
         )}
