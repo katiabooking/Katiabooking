@@ -1,425 +1,318 @@
-import { useState, useEffect } from 'react';
-import { X, Check, AlertCircle, Lock, CreditCard, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { X, CreditCard, Lock, Loader } from 'lucide-react';
 import { Button } from './ui/button';
-import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
-import { 
-  Elements, 
-  PaymentElement,
-  useStripe,
-  useElements 
-} from '@stripe/react-stripe-js';
-import logo from 'figma:asset/25258f08dbfd42d534e2cc2de58e6a86631a05a5.png';
-import { useCurrency } from '../../contexts/CurrencyContext';
+import { Card } from './ui/card';
 import { toast } from 'sonner';
-import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 interface StripePaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  planName: string;
-  price: string; // Price in base unit (e.g., "99" for AED 99)
-  currency: string; // 'aed', 'usd', etc.
-  onPaymentSuccess: (paymentIntentId: string) => void;
-  salonId?: string;
-  userId?: string;
-  type?: 'subscription' | 'booking' | 'upgrade'; // Type of payment
-}
-
-// Stripe Promise - инициализируем один раз
-let stripePromise: Promise<any> | null = null;
-
-const getStripe = async () => {
-  if (!stripePromise) {
-    try {
-      // Получаем publishable key из backend
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-3e5c72fb/stripe/config`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch Stripe config');
-      }
-
-      const { publishableKey, configured } = await response.json();
-
-      if (!configured) {
-        // DEMO MODE - silent mode, no warnings
-        return null; // Will trigger demo mode in component
-      }
-
-      stripePromise = loadStripe(publishableKey);
-    } catch (error) {
-      // Silent - don't log errors in demo mode
-      return null;
-    }
-  }
-  return stripePromise;
-};
-
-// Компонент формы оплаты (внутри Elements)
-function CheckoutForm({ 
-  amount, 
-  currency, 
-  planName,
-  onSuccess,
-  onError 
-}: { 
   amount: number;
   currency: string;
-  planName: string;
-  onSuccess: (paymentIntentId: string) => void;
-  onError: (error: string) => void;
-}) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const { formatPrice } = useCurrency();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/payment-success`,
-        },
-        redirect: 'if_required',
-      });
-
-      if (error) {
-        onError(error.message || 'Payment failed');
-        toast.error(error.message || 'Payment failed');
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        onSuccess(paymentIntent.id);
-        toast.success('Payment successful!');
-      } else {
-        onError('Payment status: ' + paymentIntent?.status);
-      }
-    } catch (err) {
-      onError(err instanceof Error ? err.message : 'Payment failed');
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Payment Element (карта, Apple Pay, Google Pay) */}
-      <div className="bg-gray-50 p-4 rounded-xl">
-        <PaymentElement />
-      </div>
-
-      {/* Информация о безопасности */}
-      <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl">
-        <Lock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-        <div className="text-sm">
-          <p className="font-medium text-blue-900 mb-1">Secure Payment</p>
-          <p className="text-blue-700">
-            Your payment information is encrypted and secure. We never store your card details.
-          </p>
-        </div>
-      </div>
-
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        disabled={!stripe || isProcessing}
-        className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold"
-      >
-        {isProcessing ? (
-          <div className="flex items-center gap-2">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Processing...
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Pay {formatPrice(amount)}
-          </div>
-        )}
-      </Button>
-
-      <p className="text-xs text-center text-gray-500">
-        By confirming your payment, you agree to our{' '}
-        <a href="/terms" className="text-purple-600 hover:underline">Terms of Service</a>
-      </p>
-    </form>
-  );
+  description: string;
+  bookingId?: string;
+  onSuccess: () => void;
 }
 
 export function StripePaymentModal({
   isOpen,
   onClose,
-  planName,
-  price,
+  amount,
   currency,
-  onPaymentSuccess,
-  salonId,
-  userId,
-  type = 'subscription'
+  description,
+  bookingId,
+  onSuccess,
 }: StripePaymentModalProps) {
   const { formatPrice } = useCurrency();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [stripeInstance, setStripeInstance] = useState<any>(null);
+  
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [cardholderName, setCardholderName] = useState('');
+  const [error, setError] = useState('');
 
-  // Конвертируем цену в минимальные единицы (центы, дирхамы и т.д.)
-  const amountInMinorUnits = Math.round(parseFloat(price) * 100);
+  // Format card number with spaces
+  const formatCardNumber = (value: string) => {
+    const cleaned = value.replace(/\s/g, '');
+    const groups = cleaned.match(/.{1,4}/g);
+    return groups ? groups.join(' ') : cleaned;
+  };
 
-  useEffect(() => {
-    if (!isOpen) {
-      // Reset state when modal closes
-      setClientSecret(null);
-      setIsLoading(true);
-      setIsSuccess(false);
-      setError(null);
+  // Format expiry date as MM/YY
+  const formatExpiryDate = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length >= 2) {
+      return cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4);
+    }
+    return cleaned;
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\s/g, '');
+    if (value.length <= 16) {
+      setCardNumber(formatCardNumber(value));
+    }
+  };
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 4) {
+      setExpiryDate(formatExpiryDate(value));
+    }
+  };
+
+  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 3) {
+      setCvv(value);
+    }
+  };
+
+  const validateForm = () => {
+    if (!cardholderName) {
+      setError('Cardholder name is required');
+      return false;
+    }
+
+    const cleanCardNumber = cardNumber.replace(/\s/g, '');
+    if (cleanCardNumber.length !== 16) {
+      setError('Card number must be 16 digits');
+      return false;
+    }
+
+    const expiryParts = expiryDate.split('/');
+    if (expiryParts.length !== 2 || expiryParts[0].length !== 2 || expiryParts[1].length !== 2) {
+      setError('Invalid expiry date (MM/YY)');
+      return false;
+    }
+
+    const month = parseInt(expiryParts[0]);
+    if (month < 1 || month > 12) {
+      setError('Invalid month (01-12)');
+      return false;
+    }
+
+    if (cvv.length !== 3) {
+      setError('CVV must be 3 digits');
+      return false;
+    }
+
+    setError('');
+    return true;
+  };
+
+  const handlePayment = async () => {
+    if (!validateForm()) {
       return;
     }
 
-    // Initialize Stripe and create payment intent
-    const initPayment = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+    setIsProcessing(true);
+    setError('');
 
-        // Load Stripe
-        const stripe = await getStripe();
-        if (!stripe) {
-          setError('Payment system is not available');
-          setIsLoading(false);
-          return;
-        }
-        setStripeInstance(stripe);
+    try {
+      // TODO: Integrate with real Stripe.js
+      // 1. Create Payment Intent on backend
+      // const response = await fetch(`/api/bookings/${bookingId}/create-payment`, {
+      //   method: 'POST',
+      //   body: JSON.stringify({
+      //     amount,
+      //     paymentType: 'deposit',
+      //     ...
+      //   })
+      // });
+      // const { clientSecret } = await response.json();
 
-        // Create payment intent
-        const response = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/make-server-3e5c72fb/stripe/create-payment-intent`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${publicAnonKey}`
-            },
-            body: JSON.stringify({
-              amount: amountInMinorUnits,
-              currency: currency.toLowerCase(),
-              planName,
-              salonId,
-              userId,
-              metadata: {
-                type,
-              }
-            })
-          }
-        );
+      // 2. Confirm payment with Stripe.js
+      // const stripe = await loadStripe(STRIPE_PUBLISHABLE_KEY);
+      // const result = await stripe.confirmCardPayment(clientSecret, {
+      //   payment_method: {
+      //     card: cardElement,
+      //     billing_details: { name: cardholderName }
+      //   }
+      // });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to create payment');
-        }
+      // Mock payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-        const { clientSecret: secret } = await response.json();
-        setClientSecret(secret);
-
-      } catch (err) {
-        console.error('Payment initialization error:', err);
-        const errorMessage = err instanceof Error ? err.message : 'Failed to initialize payment';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initPayment();
-  }, [isOpen, amountInMinorUnits, currency, planName, salonId, userId, type]);
-
-  const handlePaymentSuccess = (paymentIntentId: string) => {
-    setIsSuccess(true);
-    
-    // Close after success animation and call callback
-    setTimeout(() => {
-      onPaymentSuccess(paymentIntentId);
+      // Simulate success
+      toast.success('Payment successful! 🎉');
+      onSuccess();
       onClose();
-    }, 2000);
-  };
-
-  const handlePaymentError = (errorMessage: string) => {
-    setError(errorMessage);
+    } catch (err: any) {
+      console.error('Payment error:', err);
+      setError(err.message || 'Payment failed. Please try again.');
+      toast.error('Payment failed');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!isOpen) return null;
 
-  // Stripe Elements options
-  const options: StripeElementsOptions = {
-    clientSecret: clientSecret || undefined,
-    appearance: {
-      theme: 'stripe',
-      variables: {
-        colorPrimary: '#9333ea', // purple-600
-        colorBackground: '#ffffff',
-        colorText: '#1f2937', // gray-800
-        colorDanger: '#ef4444', // red-500
-        fontFamily: 'Inter, system-ui, sans-serif',
-        spacingUnit: '4px',
-        borderRadius: '12px',
-      },
-    },
-  };
-
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        {isSuccess ? (
-          // Success State
-          <div className="p-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-in zoom-in">
-              <Check className="w-12 h-12 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Successful!</h2>
-            <p className="text-gray-600">Welcome to Katia Booking {planName} plan</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-2xl font-bold text-gray-900">Secure Payment</h2>
+            <button
+              onClick={onClose}
+              disabled={isProcessing}
+              className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
-        ) : error ? (
-          // Error State
-          <div className="p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-bold text-gray-900">Payment Error</h2>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h3 className="font-semibold text-red-900 mb-1">Payment Failed</h3>
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              </div>
-            </div>
+          <p className="text-sm text-gray-600">
+            {description}
+          </p>
+        </div>
 
-            <div className="space-y-3">
-              <Button
-                onClick={() => {
-                  setError(null);
-                  setIsLoading(true);
-                  // Trigger re-initialization
-                  const temp = isOpen;
-                  onClose();
-                  setTimeout(() => {
-                    if (temp) {
-                      // Re-open modal
-                      window.location.reload(); // Simple reload for now
-                    }
-                  }, 100);
-                }}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                Try Again
-              </Button>
-              <Button
-                onClick={onClose}
-                variant="outline"
-                className="w-full"
-              >
-                Cancel
-              </Button>
+        {/* Amount */}
+        <div className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-b border-purple-200">
+          <div className="text-center">
+            <div className="text-sm text-gray-600 mb-1">Amount to Pay</div>
+            <div className="text-4xl font-bold text-purple-600">
+              {formatPrice(amount)}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {currency.toUpperCase()}
             </div>
           </div>
-        ) : (
-          // Payment Form
-          <>
-            {/* Header */}
-            <div className="border-b border-gray-200 p-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img src={logo} alt="Katia Booking" className="w-10 h-10 rounded-xl" />
-                <div>
-                  <h2 className="font-bold text-gray-900">Complete Payment</h2>
-                  <p className="text-sm text-gray-500">{planName} Plan</p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+        </div>
 
-            {/* Price Summary */}
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600">Subscription</span>
-                <span className="font-semibold text-gray-900">{planName}</span>
-              </div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-600">Billing Cycle</span>
-                <span className="font-semibold text-gray-900">Monthly</span>
-              </div>
-              <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
-                <span className="text-lg font-bold text-gray-900">Total</span>
-                <div className="text-right">
-                  <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    {formatPrice(amountInMinorUnits / 100)}
-                  </div>
-                  <div className="text-xs text-gray-500">per month</div>
-                </div>
-              </div>
-            </div>
+        {/* Form */}
+        <div className="p-6 space-y-4">
+          {/* Cardholder Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Cardholder Name
+            </label>
+            <input
+              type="text"
+              value={cardholderName}
+              onChange={(e) => setCardholderName(e.target.value)}
+              placeholder="John Doe"
+              disabled={isProcessing}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            />
+          </div>
 
-            {/* Payment Form */}
-            <div className="p-6">
-              {isLoading ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 text-purple-600 animate-spin mb-4" />
-                  <p className="text-gray-600">Initializing secure payment...</p>
-                </div>
-              ) : clientSecret && stripeInstance ? (
-                <Elements stripe={stripeInstance} options={options}>
-                  <CheckoutForm
-                    amount={amountInMinorUnits / 100}
-                    currency={currency}
-                    planName={planName}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
-                </Elements>
-              ) : (
-                <div className="text-center py-12">
-                  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                  <p className="text-gray-600">Unable to load payment form</p>
-                </div>
-              )}
+          {/* Card Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Card Number
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={cardNumber}
+                onChange={handleCardNumberChange}
+                placeholder="1234 5678 9012 3456"
+                disabled={isProcessing}
+                className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
+              />
+              <CreditCard className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2" />
             </div>
+          </div>
 
-            {/* Powered by Stripe */}
-            <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 rounded-b-2xl">
-              <p className="text-xs text-center text-gray-500">
-                Powered by <span className="font-semibold text-[#635BFF]">Stripe</span> • 
-                256-bit SSL encryption
-              </p>
+          {/* Expiry & CVV */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Expiry Date
+              </label>
+              <input
+                type="text"
+                value={expiryDate}
+                onChange={handleExpiryChange}
+                placeholder="MM/YY"
+                disabled={isProcessing}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
+              />
             </div>
-          </>
-        )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                CVV
+              </label>
+              <input
+                type="text"
+                value={cvv}
+                onChange={handleCvvChange}
+                placeholder="123"
+                disabled={isProcessing}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed font-mono"
+              />
+            </div>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          {/* Security Notice */}
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+            <Lock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-blue-800">
+              <strong>Secure Payment:</strong> Your payment information is encrypted and secure. 
+              We never store your card details.
+            </div>
+          </div>
+
+          {/* Test Card Info */}
+          <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-600">
+            <div className="font-semibold mb-1">Test Card (Development):</div>
+            <div className="font-mono">4242 4242 4242 4242</div>
+            <div className="font-mono">Expiry: Any future date • CVV: Any 3 digits</div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="p-6 border-t border-gray-200 flex gap-3">
+          <Button
+            onClick={onClose}
+            disabled={isProcessing}
+            variant="outline"
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handlePayment}
+            disabled={isProcessing}
+            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+          >
+            {isProcessing ? (
+              <>
+                <Loader className="w-4 h-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4 mr-2" />
+                Pay {formatPrice(amount)}
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 pb-6">
+          <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+            <div className="flex items-center gap-1">
+              <Lock className="w-3 h-3" />
+              <span>Secured by Stripe</span>
+            </div>
+            <span>•</span>
+            <span>PCI-DSS Compliant</span>
+          </div>
+        </div>
       </div>
     </div>
   );

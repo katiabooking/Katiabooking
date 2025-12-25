@@ -4,31 +4,27 @@ import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  // ВАЖНО: Для GitHub Pages
+  // ВАЖНО: Для GitHub Pages - замените 'repo-name' на имя вашего репозитория
+  // Например, если репозиторий github.com/username/katia-booking, то base: '/katia-booking/'
+  // Если используете custom domain (example.com), установите base: '/'
   base: './',
   
   plugins: [
+    // The React and Tailwind plugins are both required for Make, even if
+    // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
-    // Плагин для обработки Figma assets
-    {
-      name: 'figma-assets',
-      resolveId(id) {
-        if (id.startsWith('figma:asset/')) {
-          // Преобразуем figma:asset/... в путь к assets
-          const fileName = id.replace('figma:asset/', '')
-          return path.resolve(__dirname, `./src/assets/${fileName}`)
-        }
-      }
-    }
   ],
   resolve: {
     alias: {
+      // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // Убеждаемся что public файлы копируются корректно
   publicDir: 'public',
   build: {
+    // Копируем service worker и другие статические файлы
     copyPublicDir: true,
     rollupOptions: {
       input: {

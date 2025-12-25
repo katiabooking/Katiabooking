@@ -1,6 +1,23 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  ArrowLeft, 
+  Filter, 
+  ChevronLeft, 
+  ChevronRight, 
+  Heart, 
+  MessageCircle, 
+  Share2, 
+  Calendar, 
+  Star, 
+  Zap, 
+  TrendingUp 
+} from 'lucide-react';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { Card } from './ui/card';
+import { Button } from './ui/button';
 
 interface PublicFeedPost {
   id: string;
@@ -31,6 +48,7 @@ export function PublicFeedPage() {
   const { formatPrice } = useCurrency();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const navigate = useNavigate();
 
   // Mock data - в реальном приложении это будет из backend
   const [publicPosts] = useState<PublicFeedPost[]>([

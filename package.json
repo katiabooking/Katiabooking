@@ -7,8 +7,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "npm run build && gh-pages -d dist",
-    "git:push": "git add . && git commit -m \"Update from Figma Make\" && git push origin main",
-    "git:deploy": "git add . && git commit -m \"🚀 Deploy from Figma Make\" && git push origin main",
     "dev": "vite"
   },
   "dependencies": {
@@ -71,8 +69,6 @@
     "sonner": "2.0.3",
     "tailwind-merge": "3.2.0",
     "tw-animate-css": "1.3.8",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
     "vaul": "1.1.2"
   },
   "devDependencies": {
@@ -81,9 +77,21 @@
     "tailwindcss": "4.1.12",
     "vite": "6.3.5"
   },
-"pnpm": {
-  "overrides": {
-    "vite": "6.3.5"
+  "peerDependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "6.3.5"
+    }
   }
 }
-  }

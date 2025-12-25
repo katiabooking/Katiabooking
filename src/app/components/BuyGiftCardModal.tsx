@@ -5,6 +5,8 @@ import { Input } from './ui/input';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
 import { StripePaymentModal } from './StripePaymentModal';
+import { GiftCardPreview } from './GiftCardPreview';
+import { GiftCardTheme, GIFT_CARD_THEMES, SalonGiftCardBranding } from '../types/giftCardTemplates';
 
 interface BuyGiftCardModalProps {
   salonId: string;
@@ -14,9 +16,10 @@ interface BuyGiftCardModalProps {
 
 export function BuyGiftCardModal({ salonId, salonName, onClose }: BuyGiftCardModalProps) {
   const { formatPrice } = useCurrency();
-  const [step, setStep] = useState<'details' | 'payment' | 'success'>('details');
+  const [step, setStep] = useState<'theme' | 'details' | 'payment' | 'success'>('theme');
   
   // Form state
+  const [selectedTheme, setSelectedTheme] = useState<GiftCardTheme>('just-because');
   const [amount, setAmount] = useState('');
   const [purchaserName, setPurchaserName] = useState('');
   const [purchaserEmail, setPurchaserEmail] = useState('');
@@ -28,6 +31,14 @@ export function BuyGiftCardModal({ salonId, salonName, onClose }: BuyGiftCardMod
   const [generatedCode, setGeneratedCode] = useState('');
 
   const predefinedAmounts = [100, 200, 300, 500, 1000];
+  
+  // Mock salon branding (в реале загружается с backend)
+  const salonBranding: SalonGiftCardBranding = {
+    salonId,
+    logoPosition: 'top-left',
+    defaultTheme: 'just-because',
+    allowCustomThemes: true,
+  };
 
   const isDetailsValid = amount && purchaserName && purchaserEmail && purchaserPhone;
 
@@ -79,6 +90,7 @@ export function BuyGiftCardModal({ salonId, salonName, onClose }: BuyGiftCardMod
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-gray-900">
+              {step === 'theme' && '🎨 Select Theme'}
               {step === 'details' && '🎁 Buy Gift Card'}
               {step === 'payment' && '💳 Payment'}
               {step === 'success' && '✅ Purchase Complete'}
@@ -95,7 +107,7 @@ export function BuyGiftCardModal({ salonId, salonName, onClose }: BuyGiftCardMod
 
         {/* Content */}
         <div className="p-6">
-          {step === 'details' && (
+          {step === 'theme' && (
             <div className="space-y-6">
               {/* Step Indicator */}
               <div className="flex items-center justify-center gap-2 mb-6">
@@ -103,19 +115,76 @@ export function BuyGiftCardModal({ salonId, salonName, onClose }: BuyGiftCardMod
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center text-sm font-semibold">
                     1
                   </div>
-                  <span className="text-sm font-medium text-gray-900">Details</span>
+                  <span className="text-sm font-medium text-gray-900">Theme</span>
                 </div>
                 <div className="w-12 h-0.5 bg-gray-200" />
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-semibold">
                     2
                   </div>
-                  <span className="text-sm font-medium text-gray-600">Payment</span>
+                  <span className="text-sm font-medium text-gray-600">Details</span>
                 </div>
                 <div className="w-12 h-0.5 bg-gray-200" />
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-semibold">
                     3
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Payment</span>
+                </div>
+                <div className="w-12 h-0.5 bg-gray-200" />
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-semibold">
+                    4
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Complete</span>
+                </div>
+              </div>
+
+              {/* Theme Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Select Gift Card Theme *
+                </label>
+                <div className="grid grid-cols-5 gap-2 mb-3">
+                  {GIFT_CARD_THEMES.map((theme) => (
+                    <button
+                      key={theme}
+                      onClick={() => setSelectedTheme(theme)}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        selectedTheme === theme
+                          ? 'border-purple-600 bg-purple-50 text-purple-600 shadow-lg'
+                          : 'border-gray-200 hover:border-purple-300 hover:shadow-md'
+                      }`}
+                    >
+                      <div className="font-semibold">{theme}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 'details' && (
+            <div className="space-y-6">
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center text-sm font-semibold">
+                    2
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">Details</span>
+                </div>
+                <div className="w-12 h-0.5 bg-gray-200" />
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-semibold">
+                    3
+                  </div>
+                  <span className="text-sm font-medium text-gray-600">Payment</span>
+                </div>
+                <div className="w-12 h-0.5 bg-gray-200" />
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-sm font-semibold">
+                    4
                   </div>
                   <span className="text-sm font-medium text-gray-600">Complete</span>
                 </div>
@@ -272,25 +341,15 @@ export function BuyGiftCardModal({ salonId, salonName, onClose }: BuyGiftCardMod
               {amount && parseFloat(amount) >= 10 && (
                 <div className="border-t border-gray-200 pt-6">
                   <h3 className="font-semibold text-gray-900 mb-4">Preview</h3>
-                  <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl p-6 text-white">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="text-sm opacity-90 mb-1">{salonName}</div>
-                        <div className="text-3xl font-bold">{formatPrice(parseFloat(amount))}</div>
-                        <div className="text-sm opacity-90 mt-1">Gift Card</div>
-                      </div>
-                      <Gift className="w-12 h-12 opacity-80" />
-                    </div>
-                    {message && (
-                      <div className="bg-white/20 rounded-lg p-3 mb-4">
-                        <p className="text-sm italic">"{message}"</p>
-                      </div>
-                    )}
-                    <div className="text-sm opacity-90">
-                      <div>From: {purchaserName || 'Your Name'}</div>
-                      {recipientName && <div>To: {recipientName}</div>}
-                    </div>
-                  </div>
+                  <GiftCardPreview
+                    salonName={salonName}
+                    amount={parseFloat(amount)}
+                    purchaserName={purchaserName}
+                    recipientName={recipientName}
+                    message={message}
+                    theme={selectedTheme}
+                    salonBranding={salonBranding}
+                  />
                 </div>
               )}
             </div>

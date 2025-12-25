@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { mockSalons } from '../data/mockData';
-import { Star, MapPin, Clock, Phone, Mail, X, Images, Check, Car, Baby, CreditCard, Users, ChevronLeft, ChevronRight, MessageCircle, Calendar, Bot, Navigation, ArrowLeft, Heart, Share2 } from 'lucide-react';
+import { Star, MapPin, Clock, Phone, Mail, X, Images, Check, Car, Baby, CreditCard, Users, ChevronLeft, ChevronRight, MessageCircle, Calendar, Bot, Navigation, ArrowLeft, Heart, Share2, Gift } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
@@ -18,6 +18,7 @@ import { AIBookingChat } from '../components/AIBookingChat';
 import { SalonMapModal } from '../components/SalonMapModal';
 import { SalonCard } from '../components/SalonCard';
 import { ShareSalonModal } from '../components/ShareSalonModal';
+import { BuyGiftCardModal } from '../components/BuyGiftCardModal';
 import { toast } from 'sonner';
 import {
   Carousel,
@@ -62,6 +63,16 @@ export function SalonProfilePage() {
   const [preSelectedService, setPreSelectedService] = useState<any>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showGiftCardModal, setShowGiftCardModal] = useState(false);
+  
+  // Gift Card Settings - Mock (в реальном приложении загружается с backend)
+  const giftCardSettings = {
+    enabled: true, // Owner включил функцию
+    presetAmounts: [100, 200, 300, 500, 1000],
+    allowCustomAmounts: true,
+    minAmount: 50,
+    maxAmount: 5000
+  };
   
   // Toggle favorite
   const toggleFavorite = async () => {
@@ -364,6 +375,13 @@ export function SalonProfilePage() {
             <Tabs defaultValue="services" className="space-y-6">
               <TabsList className="bg-white border border-gray-200">
                 <TabsTrigger value="services">Services</TabsTrigger>
+                {/* Показываем вкладку только если Owner включил функцию */}
+                {giftCardSettings.enabled && (
+                  <TabsTrigger value="giftcards">
+                    <Gift className="w-4 h-4 mr-1" />
+                    Gift Cards
+                  </TabsTrigger>
+                )}
                 <TabsTrigger value="staff">Staff</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews</TabsTrigger>
                 <TabsTrigger value="about">About</TabsTrigger>
@@ -404,6 +422,142 @@ export function SalonProfilePage() {
                     </div>
                   </Card>
                 ))}
+              </TabsContent>
+
+              {/* Gift Cards Tab */}
+              <TabsContent value="giftcards" className="space-y-4">
+                {/* Hero Banner with Image */}
+                <Card className="overflow-hidden">
+                  <div className="grid md:grid-cols-2 gap-0">
+                    {/* Left: Beautiful Image */}
+                    <div className="relative h-64 md:h-auto">
+                      <img
+                        src="https://images.unsplash.com/photo-1759563871370-692ab3de97ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBnaWZ0JTIwY2FyZCUyMHByZXNlbnR8ZW58MXx8fHwxNzY2NjU1MTM5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                        alt="Gift Card"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20" />
+                    </div>
+                    
+                    {/* Right: Content */}
+                    <div className="p-6 md:p-8 flex flex-col justify-center bg-gradient-to-br from-purple-50 to-pink-50">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+                          <Gift className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-gray-900">Gift Cards</h3>
+                          <p className="text-sm text-purple-600">Perfect for any occasion</p>
+                        </div>
+                      </div>
+                      
+                      <p className="text-gray-700 mb-6">
+                        Give the gift of relaxation and beauty with a gift card from {salon.name}. Perfect for birthdays, anniversaries, holidays, or just to show someone you care.
+                      </p>
+                      
+                      <div className="space-y-3 mb-6">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <span>Valid for all services at {salon.name}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <span>Can be used in multiple visits</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <span>Delivered instantly via email</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                          <span>Never expires</span>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        onClick={() => setShowGiftCardModal(true)}
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
+                        size="lg"
+                      >
+                        <Gift className="w-5 h-5 mr-2" />
+                        Buy Gift Card Now
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Available Amounts */}
+                <Card className="p-6">
+                  <h3 className="font-bold text-lg mb-4">Choose an Amount</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {giftCardSettings.presetAmounts.map((amount) => (
+                      <button
+                        key={amount}
+                        onClick={() => setShowGiftCardModal(true)}
+                        className="group relative p-6 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-lg transition-all duration-200 bg-white hover:bg-purple-50"
+                      >
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
+                            {formatPrice(amount)}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1 group-hover:text-purple-600 transition-colors">
+                            Gift Card
+                          </div>
+                        </div>
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {giftCardSettings.allowCustomAmounts && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex items-center gap-2 text-sm text-blue-900">
+                        <CreditCard className="w-4 h-4" />
+                        <span className="font-medium">Want a custom amount?</span>
+                      </div>
+                      <p className="text-xs text-blue-700 mt-1">
+                        Choose any amount from {formatPrice(giftCardSettings.minAmount)} to {formatPrice(giftCardSettings.maxAmount)} during checkout
+                      </p>
+                    </div>
+                  )}
+                </Card>
+
+                {/* How It Works */}
+                <Card className="p-6">
+                  <h3 className="font-bold text-lg mb-4">How It Works</h3>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-3 font-bold">
+                        1
+                      </div>
+                      <h4 className="font-semibold mb-2">Select Amount</h4>
+                      <p className="text-sm text-gray-600">
+                        Choose a preset amount or enter a custom value
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-3 font-bold">
+                        2
+                      </div>
+                      <h4 className="font-semibold mb-2">Personalize</h4>
+                      <p className="text-sm text-gray-600">
+                        Add recipient info and a personal message
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mx-auto mb-3 font-bold">
+                        3
+                      </div>
+                      <h4 className="font-semibold mb-2">Send Instantly</h4>
+                      <p className="text-sm text-gray-600">
+                        Gift card delivered via email right away
+                      </p>
+                    </div>
+                  </div>
+                </Card>
               </TabsContent>
 
               {/* Staff Tab */}
@@ -734,6 +888,15 @@ export function SalonProfilePage() {
         isOpen={showShareMenu}
         onClose={() => setShowShareMenu(false)}
       />
+
+      {/* Buy Gift Card Modal */}
+      {showGiftCardModal && (
+        <BuyGiftCardModal
+          salonId={salon.id}
+          salonName={salon.name}
+          onClose={() => setShowGiftCardModal(false)}
+        />
+      )}
 
       <Footer />
     </div>

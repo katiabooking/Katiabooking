@@ -28,6 +28,7 @@ console.log('📍 Location:', window.location.href);
 declare global {
   interface Window {
     __REACT_ROOT__?: Root;
+    __REACT_ROOT_CONTAINER__?: HTMLElement;
   }
 }
 
@@ -47,14 +48,42 @@ const appComponent = isDevelopment ? (
   </ErrorBoundary>
 );
 
-// ИСПРАВЛЕНИЕ: Проверяем что root не был создан ранее
-// Это предотвращает React Double Render warning
-if (!window.__REACT_ROOT__) {
+// ИСПРАВЛЕНИЕ: Проверяем что root не был создан ранее ИЛИ контейнер изменился
+// Это предотвращает React Double Render warning в dev и HMR
+if (!window.__REACT_ROOT__ || window.__REACT_ROOT_CONTAINER__ !== rootElement) {
   console.log('✅ Creating new React root');
+  
+  // Cleanup old root if exists
+  if (window.__REACT_ROOT__) {
+    console.log('🔄 Unmounting old root');
+    try {
+      window.__REACT_ROOT__.unmount();
+    } catch (e) {
+      console.warn('⚠️ Could not unmount old root:', e);
+    }
+  }
+  
   window.__REACT_ROOT__ = createRoot(rootElement);
+  window.__REACT_ROOT_CONTAINER__ = rootElement;
   window.__REACT_ROOT__.render(appComponent);
   console.log('✅ App rendered successfully');
 } else {
   console.log('ℹ️ Reusing existing React root');
   window.__REACT_ROOT__.render(appComponent);
+}
+
+// HMR cleanup
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    console.log('🔥 HMR: Cleaning up old root');
+    if (window.__REACT_ROOT__) {
+      try {
+        window.__REACT_ROOT__.unmount();
+      } catch (e) {
+        console.warn('⚠️ HMR cleanup error:', e);
+      }
+      window.__REACT_ROOT__ = undefined;
+      window.__REACT_ROOT_CONTAINER__ = undefined;
+    }
+  });
 }

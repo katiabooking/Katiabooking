@@ -12,12 +12,17 @@ import {
   CheckCircle,
   ArrowLeft,
   Maximize2,
-  Minimize2
+  Minimize2,
+  ShoppingBag
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { useMasters } from '../../contexts/MastersContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { QuickRetailCheckout } from '../components/QuickRetailCheckout';
+import { EnhancedCheckoutModal } from '../components/EnhancedCheckoutModal';
+import { DEMO_PRODUCTS } from '../data/demoProducts';
+import { toast } from 'sonner';
 
 type CalendarView = 'day' | 'week' | 'month';
 
@@ -33,6 +38,10 @@ export function MasterDashboard({ onBack }: MasterDashboardProps) {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Quick Retail Checkout state
+  const [showEnhancedCheckout, setShowEnhancedCheckout] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   // Update current time every minute for the red line
   useEffect(() => {
@@ -932,7 +941,27 @@ export function MasterDashboard({ onBack }: MasterDashboardProps) {
           </div>
 
           {/* Right Side - Calendar */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-0">
+            {/* Quick Retail Checkout - Products Only */}
+            <div className="bg-white rounded-t-lg shadow-lg overflow-hidden mb-6">
+              <QuickRetailCheckout
+                salonId="demo-salon-123"
+                products={DEMO_PRODUCTS}
+                onCheckoutComplete={async (sale) => {
+                  console.log('✅ Retail sale completed:', sale);
+                  
+                  toast.success(`🛍️ Sale completed! ${sale.items.length} items sold`, {
+                    description: sale.certificateUsed 
+                      ? `Certificate used: ${sale.certificateUsed.code}`
+                      : `Total: AED ${sale.total}`,
+                  });
+                  
+                  // In production: Send to backend
+                  // await recordRetailSale(sale);
+                }}
+              />
+            </div>
+
             {/* Today's Summary */}
             <div className="grid md:grid-cols-2 gap-4">
               <Card>

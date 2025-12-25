@@ -29,6 +29,7 @@ import { BookingFlowPage } from './pages/BookingFlowPage';
 import { RoleBasedRedirect } from './pages/RoleBasedRedirect';
 import { TestDemo } from './pages/TestDemo';
 import { UpgradeDemo } from './pages/UpgradeDemo';
+import { QuickRetailDemo } from './pages/QuickRetailDemo';
 import 'slick-carousel/slick/slick.css';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -50,7 +51,7 @@ export default function App() {
         
         initInstallPrompt();
       } catch (error) {
-        // Тихо игнорируем - PWA опциональный
+        // Тихо игнорируем - PWA опциональны��
       }
     };
 
@@ -99,6 +100,7 @@ export default function App() {
                       <Route path="/redirect" element={<RoleBasedRedirect />} />
                       <Route path="/test" element={<TestDemo />} />
                       <Route path="/upgrade" element={<UpgradeDemo />} />
+                      <Route path="/quick-retail" element={<QuickRetailDemo />} />
                       <Route path="/blocked-demo" element={<BlockedSalonDemo />} />
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>

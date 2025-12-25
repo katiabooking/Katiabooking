@@ -10,6 +10,11 @@ import emailVerificationRoutes from "./email-verification.tsx";
 import registrationRoutes from "./registration.tsx";
 import stripeRoutes from "./stripe-routes.tsx";
 import subscriptionUpgradeRoutes from "./subscription-upgrade.tsx";
+import depositRoutes from "./depositRoutes.ts";
+import bookingWorkflowRoutes from "./bookingWorkflowRoutes.ts";
+import realtimeSlotsRoutes from "./realtimeSlots.ts";
+import paymentTrackingRoutes from "./paymentTracking.ts";
+import certificateRedemptionRoutes from "./certificateRedemption.ts";
 import { sendBookingReminders } from "./notifications.tsx";
 
 const app = new Hono();
@@ -52,11 +57,26 @@ app.route("/", emailVerificationRoutes);
 // Mount registration routes
 app.route("/", registrationRoutes);
 
-// Mount Stripe payment routes
-app.route("/make-server-3e5c72fb/stripe", stripeRoutes);
+// Mount stripe routes
+app.route("/", stripeRoutes);
 
 // Mount subscription upgrade routes
-app.route("/make-server-3e5c72fb/subscription-upgrade", subscriptionUpgradeRoutes);
+app.route("/", subscriptionUpgradeRoutes);
+
+// Mount deposit & payment routes
+app.route("/", depositRoutes);
+
+// Mount booking workflow routes ⭐ NEW
+app.route("/", bookingWorkflowRoutes);
+
+// Mount real-time slots routes ⭐ NEW
+app.route("/", realtimeSlotsRoutes);
+
+// Mount payment tracking routes ⭐ NEW
+app.route("/", paymentTrackingRoutes);
+
+// Mount certificate redemption routes ⭐ NEW
+app.route("/", certificateRedemptionRoutes);
 
 // ============================================
 // NOTIFICATIONS SCHEDULER
