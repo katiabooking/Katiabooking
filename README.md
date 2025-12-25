@@ -1,342 +1,217 @@
-# 💜 Katia - Beauty Salon Booking Platform
+# 💜 Katia - Салон красоты SaaS платформа
 
-Современная SaaS платформа для бронирования услуг салонов красоты (аналог Fresha) с фиолетово-розовым градиентным дизайном.
+[![CI Pipeline](https://github.com/YOUR_USERNAME/YOUR_REPO/workflows/CI%20Pipeline/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions)
+[![codecov](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/YOUR_REPO)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<!-- Раскомментируйте после деплоя и замените YOUR_USERNAME на ваш GitHub username -->
-<!-- ![Deploy Status](https://github.com/YOUR_USERNAME/katia-platform/actions/workflows/deploy.yml/badge.svg) -->
-<!-- ![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Ready-success) -->
-<!-- ![License](https://img.shields.io/badge/license-Proprietary-blue) -->
-
----
+Современная платформа для управления салонами красоты с поддержкой нескольких типов пользователей, системой бронирования, CRM и аналитикой.
 
 ## 🚀 Быстрый старт
 
-### ⚡ ONE-CLICK PUSH В GITHUB:
-
-**После изменений в Figma Make, просто:**
-
-**Windows (двойной клик):**
-```
-push.bat
-```
-
-**Или PowerShell:**
-```powershell
-.\push.ps1
-```
-
-**Или npm (универсально):**
 ```bash
-npm run git:deploy
-```
-
-📚 **Подробнее:** [AUTO_PUSH_GUIDE.md](./AUTO_PUSH_GUIDE.md) | ⚡ [QUICK_PUSH.md](./QUICK_PUSH.md)
-
----
-
-### Установка зависимостей:
-
-```bash
+# Установка зависимостей
 npm install
-# или
-pnpm install
+
+# Запуск в dev режиме
+npm run dev
+
+# Запуск тестов
+npm test
+
+# Запуск тестов с UI
+npm run test:ui
+
+# Проверка coverage
+npm run test:coverage
+
+# Линтинг
+npm run lint
+
+# Форматирование
+npm run format
+
+# CI проверка (lint + format + tests)
+npm run ci
+
+# Билд для production
+npm run build
+
+# Deploy на GitHub Pages
+npm run deploy
 ```
 
-### Запуск dev сервера:
+## 🏗️ Архитектура
+
+### Frontend
+- **React 18.3.1** + **TypeScript**
+- **Vite 6.3.5** (быстрая сборка)
+- **Tailwind CSS 4.1.12** (фиолетово-розовые градиенты)
+- **Radix UI** (доступные компоненты)
+- **Motion** (анимации)
+- **React Router 7.11.0** (навигация)
+
+### Backend
+- **Supabase** (база данных, auth, storage)
+- **Stripe** (платежи, подписки)
+- **Edge Functions** (serverless API)
+
+### Testing & CI/CD
+- **Vitest** (unit тесты)
+- **Testing Library** (React тесты)
+- **ESLint + Prettier** (code quality)
+- **GitHub Actions** (CI/CD pipelines)
+
+## 🧪 Тестирование
+
+### Тесты авторизации
+
+Полное покрытие тестами для `AuthContext`:
 
 ```bash
-npm run dev
-# или
-pnpm dev
+# Запустить только auth тесты
+npx vitest run src/test/contexts/AuthContext.test.tsx
+
+# Все тесты с coverage
+npm run test:coverage
 ```
 
-Откройте: **http://localhost:5173**
+**Покрытие:**
+- ✅ Initial state и loading
+- ✅ Session загрузка
+- ✅ Email login (успех/ошибки)
+- ✅ Email signup (успех/ошибки)
+- ✅ Google OAuth
+- ✅ Facebook OAuth
+- ✅ Sign out
+- ✅ Auth state changes
+- ✅ Cleanup при unmount
 
----
+### Coverage требования
 
-## ✨ Возможности
-
-### ✅ Реализовано:
-
-- 🔐 **Авторизация** - Email/Password + OAuth (Google, Facebook)
-- 🏠 **Главная страница** - Hero section с поиском
-- 🏪 **Каталог салонов** - Карусели с салонами
-- 📱 **Mobile-first** - Адаптивный дизайн
-- 💎 **UI компоненты** - shadcn/ui кмпоннты
-- 🎨 **Дизайн** - Фиолетово-розовые градиенты
-- 🔔 **Уведомления** - Toast notifications (Sonner)
-- 👤 **Профиль пользователя** - Dropdown меню в Header
-
-### 🚧 В разработке:
-
-- 📅 Календарь бронирований (Drag & Drop)
-- 💳 Платёжная система (Stripe)
-- 📊 Аналитика для салонов
-- ⭐ Отзывы и рейтинги
-- 📸 Галереи работ мастеров
-
----
-
-## 📁 Структура проекта
-
-```
-katia-platform/
-├── src/
-│   ├── app/
-│   │   ├── components/     - React компоненты
-│   │   │   ├── ui/        - shadcn/ui компоненты
-│   │   │   └── ...
-│   │   └── pages/         - Страницы приложения
-│   ├── contexts/          - React Contexts (Auth)
-│   ├── lib/              - Утилиты и клиенты (Supabase)
-│   └── styles/           - CSS стили
-├── .env                  - Environment variables (не в git!)
-├── .env.example          - Пример .env
-└── package.json
+```json
+{
+  "lines": 80,
+  "functions": 80,
+  "branches": 80,
+  "statements": 80
+}
 ```
 
----
+## 📦 Scripts
 
-## 🔧 Технологии
+| Command | Описание |
+|---------|----------|
+| `npm run dev` | Запуск dev сервера |
+| `npm run build` | Production build |
+| `npm run preview` | Превью production build |
+| `npm run deploy` | Deploy на GitHub Pages |
+| `npm test` | Запуск тестов (watch mode) |
+| `npm run test:ui` | Тесты с UI |
+| `npm run test:coverage` | Coverage report |
+| `npm run lint` | ESLint проверка |
+| `npm run lint:fix` | ESLint fix |
+| `npm run format` | Prettier форматирование |
+| `npm run format:check` | Prettier проверка |
+| `npm run ci` | Полная CI проверка |
 
-- **Frontend:** React 18 + TypeScript
-- **Build:** Vite
-- **Styling:** Tailwind CSS 4
-- **UI:** shadcn/ui + Radix UI
-- **Backend:** Supabase (Auth, Database, Storage)
-- **Routing:** React Router 7
-- **Forms:** React Hook Form
-- **Animations:** Motion (Framer Motion)
-- **Icons:** Lucide React
+## 🔄 CI/CD Pipelines
 
----
+### Main Pipeline (`.github/workflows/ci.yml`)
+
+Запускается при push в `main` или `develop`:
+
+1. **Lint** - ESLint + Prettier
+2. **Test** - Vitest с coverage
+3. **Build** - Production build
+4. **Deploy** - GitHub Pages (только main)
+
+### PR Checks (`.github/workflows/pr-checks.yml`)
+
+При создании PR:
+
+1. Code quality проверки
+2. Auth тесты
+3. Coverage отчет в комментариях
+
+### Deploy Preview (`.github/workflows/deploy-preview.yml`)
+
+Preview build для каждого PR
 
 ## 🔐 Environment Variables
 
-Файл `.env` уже создан с вашими credentials:
+Создайте `.env.local`:
 
-```bash
-VITE_SUPABASE_URL=https://bbayqzqlqgqipohulcsd.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_FmZxEB3IzAM-KrIbH372xQ_vMx5KJ42
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-**⚠️ Важно:** После изменения `.env` нужно перезапустить dev server!
+**GitHub Secrets:**
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `GITHUB_TOKEN` (автоматически)
 
-**⚠️ БЕЗОПАСНОСТЬ:** Файл `.env` содержит секретные ключи и НЕ должен коммититься в git!
+## 👥 Типы пользователей
 
-### Настройка .env:
+- **Owner** - Владелец салона
+- **Admin** - Администратор
+- **Master** - Мастер
+- **Client** - Клиент
 
-1. **Файл `.env` уже создан** со всеми необходимыми переменными
-2. **Обновите секретные ключи:**
-   ```bash
-   # Откройте .env и замените placeholder значения:
-   SUPABASE_SERVICE_ROLE_KEY=your_actual_key
-   STRIPE_SECRET_KEY=sk_test_your_key
-   EMAIL_API_KEY=re_your_key
-   ```
-3. **Перезапустите сервер:**
-   ```bash
-   npm run dev
-   ```
+## 💰 Подписки
 
-📖 **Полное руководство:** [ENV_VARIABLES_GUIDE.md](./ENV_VARIABLES_GUIDE.md)
+- **Starter** - AED 99/мес
+- **Professional** - AED 299/мес
+- **Business** - AED 499/мес
 
----
+## 🎯 Основные фичи
 
-## 📚 Документация
+- ✅ Мультиязычность (EN/RU/AR)
+- ✅ Конвертация валют (AED/USD/EUR/RUB)
+- ✅ Система бронирования
+- ✅ CRM и аналитика
+- ✅ Подарочные сертификаты
+- ✅ Депозиты через Stripe Connect
+- ✅ Email рассылки
+- ✅ Quick Retail Checkout
+- ✅ Система избранного
+- ✅ Шаринг салонов
 
-- **[START_HERE.md](./START_HERE.md)** - 🚀 Начните отсюда!
-- **[NEXT_STEPS.md](./NEXT_STEPS.md)** - Следующие этапы
-- **[SUPABASE_INTEGRATION_GUIDE.md](./SUPABASE_INTEGRATION_GUIDE.md)** - Полное руководство по Supabase
+## 📊 Структура проекта
 
-### Environment Variables:
-- **[ENV_QUICK_START.md](./ENV_QUICK_START.md)** - ⚡ Быстрая настройка .env
-- **[ENV_VARIABLES_GUIDE.md](./ENV_VARIABLES_GUIDE.md)** - 📖 Полное руководство по переменным окружения
-- **[ENV_SETUP_COMPLETE.md](./ENV_SETUP_COMPLETE.md)** - ✅ Что было настроено
-
-### GitHub Pages Deploy:
-- **[QUICK_DEPLOY_GUIDE.md](./QUICK_DEPLOY_GUIDE.md)** - ⚡ Быстрый деплой (3 минуты)
-- **[GITHUB_PAGES_DEPLOY.md](./GITHUB_PAGES_DEPLOY.md)** - 📖 Полная инструкция по деплою
-- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - ✅ Чеклист деплоя
-- **[COMMAND_CHEATSHEET.md](./COMMAND_CHEATSHEET.md)** - 💻 Команды для копирования
-
----
-
-## 🎯 Основные маршруты
-
-| Путь | Описание |
-|------|----------|
-| `/` | Главная страница |
-| `/auth` | Авторизация / Регистрация |
-| `/salons` | Каталог салонов |
-| `/salon/:id` | Профиль салона |
-| `/booking/:salonId/:serviceId` | Бронирование услуги |
-| `/dashboard` | Личный кабинт клина |
-| `/salon-dashboard` | Кабинет владельца салона |
-| `/admin` | Админ панель |
-
----
-
-## 👥 Команда
-
-- **Вы** - Project Lead
-- **Dev1** - Backend разработчик
-- **Dev2** - Frontend разработчик
-
----
-
-## 📦 Скрипты
-
-```bash
-# Development
-npm run dev          # Запуск dev сервера
-
-# Build
-npm run build        # Production build
-
-# Preview
-npm run preview      # Предпросмотр production build
-
-# Deploy to GitHub Pages
-npm run deploy       # Деплой на GitHub Pages (после настройки)
+```
+katia/
+├── .github/
+│   └── workflows/          # CI/CD pipelines
+├── src/
+│   ├── app/
+│   │   ├── components/     # React компоненты
+│   │   └── App.tsx         # Main app
+│   ├── contexts/           # React contexts
+│   ├── lib/                # Utilities
+│   ├── styles/             # CSS
+│   └── test/               # Тесты
+│       ├── setup.ts        # Test setup
+│       └── contexts/       # Context тесты
+├── supabase/
+│   └── functions/          # Edge functions
+├── .eslintrc.js            # ESLint config
+├── .prettierrc             # Prettier config
+├── vitest.config.ts        # Vitest config
+└── package.json
 ```
 
----
+## 🤝 Contributing
 
-## 🌐 Деплой на GitHub Pages
+1. Создайте feature branch
+2. Напишите тесты
+3. Убедитесь что `npm run ci` проходит
+4. Создайте PR
 
-### ⚡ Быстрый старт (1 команда!)
+## 📝 License
 
-**✅ ВСЁ ГОТОВО! package-lock.json создан!**
-
-```bash
-git add .github/workflows/deploy.yml package-lock.json && git commit -m "🚀 Deploy Katia Platform" && git push origin main
-```
-
-**После push добавьте GitHub Secrets и сайт будет live через 2-3 минуты!**
-
-👉 **[START_DEPLOY.md](./START_DEPLOY.md)** - 🚀 **НАЧНИТЕ ЗДЕСЬ!** Деплой за 3 шага
+MIT © Katia Team
 
 ---
 
-### 🎉 ВСЕ ИСПРАВЛЕНИЯ ГОТОВЫ!
-
-✅ **package-lock.json создан** - GitHub Actions видит lock file  
-✅ **cache-dependency-path добавлен** - явно указан путь к lock file  
-✅ **npm ci --legacy-peer-deps** - детерминированная установка  
-✅ **cache: 'npm' работает** - кэширование (3x быстрее)  
-✅ **Workflow в правильном месте** - /.github/workflows/deploy.yml  
-✅ **Node.js 20.x** - правильная версия  
-✅ **React Double Render исправлен** - StrictMode условный  
-✅ **Environment variables** - добавлены в workflow  
-
-👉 **[ГОТОВО_К_PUSH.md](./ГОТОВО_К_PUSH.md)** - 🚀 **ЗАПУСТИТЕ ПРЯМО СЕЙЧАС!** (1 команда)  
-👉 **[PACKAGE_LOCK_CREATED.md](./PACKAGE_LOCK_CREATED.md)** - 📖 Полное объяснение  
-👉 **[DEPLOY_READY_NOW.md](./DEPLOY_READY_NOW.md)** - 🚀 Быстрый старт
-
-### 🔧 Документация по деплою:
-
-**🔥 Быстрый старт:**
-- 🚀 **[START_DEPLOY.md](./START_DEPLOY.md)** - **НАЧНИТЕ ЗДЕСЬ!** Деплой за 3 шага
-- ⚡ **[QUICK_FIX_NOW.md](./QUICK_FIX_NOW.md)** - Быстрая инструкция (1 минута)
-
-**📦 Детали исправлений:**
-- 📦 **[PACKAGE_LOCK_SOLUTION.md](./PACKAGE_LOCK_SOLUTION.md)** - package-lock.json создан!
-- 🔧 **[NODE_VERSION_FIX.md](./NODE_VERSION_FIX.md)** - Node.js версия
-- 📋 **[LOCK_FILE_FIX.md](./LOCK_FILE_FIX.md)** - Альтернативные решения
-
-**📚 Полные гайды:**
-- ✅ **[ALL_FIXES_APPLIED.md](./ALL_FIXES_APPLIED.md)** - Полный список исправлений
-- 📖 **[READY_TO_DEPLOY.md](./READY_TO_DEPLOY.md)** - React + Vite деплой
-- 🚀 **[GITHUB_PAGES_SETUP.md](./GITHUB_PAGES_SETUP.md)** - Полное руководство
-- 💻 **[GITHUB_DEPLOY_COMMANDS.md](./GITHUB_DEPLOY_COMMANDS.md)** - Команды для копирования
-
-### 🔑 Требуемые GitHub Secrets:
-
-Добавьте в Settings → Secrets and variables → Actions:
-
-| Secret Name | Где взять | Обязате��ьно |
-|-------------|-----------|-------------|
-| `VITE_SUPABASE_URL` | Supabase Dashboard → Project Settings | ✅ Да |
-| `VITE_SUPABASE_ANON_KEY` | Supabase Dashboard → API Keys | ✅ Да |
-| `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → API Keys | 🔵 Опционально |
-| `VITE_GOOGLE_MAPS_API_KEY` | Google Cloud Console | 🔵 Опционально |
-
-**Где получить VITE_SUPABASE_ANON_KEY:**
-1. Откройте https://supabase.com/dashboard/project/bbayqzqlqgqipohulcsd/settings/api
-2. Скопируйте "anon / public" ключ
-
----
-
-## 🔥 Фичи
-
-### Для клиентов:
-- 🔍 Поиск салонов по городу/услугам
-- 📅 Онлайн бронирование
-- ⭐ Отзывы и рейтинги
-- 💳 Онлайн оплата
-- 📱 Push уведомления
-
-### Для владельцев салонов:
-- 📊 Анаитика и отчёты
-- 👥 Управление мастерами
-- 📅 Календарь записей
-- 💰 Управление ценами
-- 📈 Статистика продаж
-
-### Для мастеров:
-- 📅 Личный календарь
-- 💬 Чат с клиентами
-- 📸 Портфолио работ
-- 💵 Учёт доходов
-
----
-
-## 🎨 Дизайн-система
-
-### Цвета:
-- **Primary:** Purple gradient (#9333ea → #ec4899)
-- **Secondary:** Pink
-- **Background:** White
-- **Text:** Gray-900
-
-### Шрифт:
-- **Inter** - весь UI
-
-### Mobile-first:
-- Карусели для каталогов
-- 85% ширина карточек (видна следующая)
-- Swipe жесты
-
----
-
-## 🐛 Troubleshooting
-
-### "Missing Supabase environment variables"
-→ Перезапустите dev server: `npm run dev`
-
-### "Port 5173 already in use"
-→ Vite автоматически выберит другой порт
-
-### OAuth не работает
-→ Настройте провайдеров в Supabase Dashboard
-
-### "You are calling ReactDOMClient.createRoot()..." warning
-→ ✅ Исправлено! См. [ERROR_FIXES_SUMMARY.md](./ERROR_FIXES_SUMMARY.md)
-
----
-
-## 📄 Лицензия
-
-Проприетарный прокт - Katia Platform
-
----
-
-## 🚀 Статус проекта
-
-**Версия:** MVP в разработке  
-**Статус:** ✅ Auth готов, 🚧 Booking в процессе
-
----
-
-**Создано с 💜 командой Katia**
+**Made with 💜 by Katia Team**
