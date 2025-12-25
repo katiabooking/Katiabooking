@@ -1,134 +1,203 @@
-# ✅ Чеклист для исправления 404 на GitHub Pages
+# ✅ Deployment Checklist
 
-## 🔴 Проблема
-Проект запушен на GitHub, но при открытии страницы выдает **404 ошибку**.
+Проверьте перед деплоем на production.
 
-## ✅ Решение (выполнено!)
+## 📦 Pre-Deploy
 
-### Что было сделано:
+### Code Quality
 
-- ✅ **Настроен vite.config.ts** с правильным base path
-- ✅ **Создан /public/404.html** для SPA редиректа
-- ✅ **Добавлен скрипт редиректа в index.html**
-- ✅ **Создан .nojekyll** файл для GitHub Pages
-- ✅ **Создан GitHub Actions workflow** для автодеплоя
-- ✅ **Обновлен package.json** с deploy скриптом
-- ✅ **Добавлена документация** (3 файла)
+- [ ] `npm run lint` проходит без ошибок
+- [ ] `npm run format:check` проходит
+- [ ] `npm run test` все тесты зеленые
+- [ ] `npm run test:coverage` >= 80%
+- [ ] `npm run ci` полностью проходит
 
----
+### Build
 
-## 🎯 ЧТО НУЖНО СДЕЛАТЬ СЕЙЧАС
+- [ ] `npm run build` успешен
+- [ ] `npm run preview` работает локально
+- [ ] Нет console.error в production build
+- [ ] Bundle size приемлемый (проверить dist/)
 
-### Шаг 1: Определите имя вашего репозитория
+### Environment
 
-Ваш GitHub URL выглядит как:
-```
-https://github.com/USERNAME/REPO-NAME
-```
+- [ ] `.env.local` не в git
+- [ ] GitHub Secrets настроены:
+  - [ ] `VITE_SUPABASE_URL`
+  - [ ] `VITE_SUPABASE_ANON_KEY`
+- [ ] Все VITE_ переменные имеют правильный префикс
+- [ ] Production конфиг проверен
 
-Например:
-- `https://github.com/john/katia-booking` → REPO-NAME = `katia-booking`
-- `https://github.com/john/john.github.io` → REPO-NAME = `john.github.io`
+### Git
 
-### Шаг 2: Обновите vite.config.ts
+- [ ] Все изменения закоммичены
+- [ ] Branch синхронизирован с main
+- [ ] Нет конфликтов
+- [ ] Conventional commits используются
 
-Откройте файл `/vite.config.ts` и измените **строку 10**:
+## 🚀 Deploy
 
-**Вариант A: Обычный репозиторий (например, katia-booking)**
-```typescript
-base: '/katia-booking/',  // ← Замените на ваше REPO-NAME
-```
+### GitHub Pages
 
-**Вариант B: Username.github.io репозиторий**
-```typescript
-base: './',  // ← Оставьте как есть
-```
+- [ ] Repository → Settings → Pages включен
+- [ ] Source: GitHub Actions
+- [ ] Base URL в vite.config.ts корректен
+- [ ] Custom domain настроен (если используется)
 
-**Вариант C: Свой домен (katia.beauty)**
-```typescript
-base: '/',  // ← Измените на корень
-```
+### CI/CD
 
-### Шаг 3: Настройте GitHub Pages
+- [ ] `.github/workflows/ci.yml` существует
+- [ ] Main pipeline проходит
+- [ ] Deploy job выполнился
+- [ ] GitHub Actions зеленые
 
-1. Откройте ваш репозиторий на **GitHub.com**
-2. Перейдите в **Settings** (верхнее меню)
-3. Найдите **Pages** в левой боковой панели
-4. В разделе **Source** выберите: **`GitHub Actions`**
-5. Нажмите **Save**
+## ✅ Post-Deploy
 
-### Шаг 4: Закоммитьте и запушьте изменения
+### Проверка Production
+
+- [ ] Сайт открывается по URL
+- [ ] Главная страница загружается
+- [ ] Все роуты работают (/dashboard, /booking, etc.)
+- [ ] Нет 404 ошибок на страницах
+- [ ] Console чистый (без errors)
+
+### Функциональность
+
+- [ ] Авторизация работает:
+  - [ ] Sign Up
+  - [ ] Sign In (Email)
+  - [ ] Google OAuth
+  - [ ] Facebook OAuth
+  - [ ] Sign Out
+- [ ] Навигация работает
+- [ ] Supabase подключен
+- [ ] API calls проходят
+
+### Performance
+
+- [ ] Lighthouse Score > 90
+- [ ] Первая загрузка < 3 сек
+- [ ] Изображения оптимизированы
+- [ ] No console warnings
+
+### Mobile
+
+- [ ] Responsive design работает
+- [ ] Touch interactions работают
+- [ ] Нет horizontal scroll
+- [ ] Fonts читаемые
+
+### SEO (если применимо)
+
+- [ ] Title правильный
+- [ ] Meta description
+- [ ] Open Graph tags
+- [ ] Favicon
+
+## 🐛 Known Issues Check
+
+### React Warnings
+
+- [ ] Нет "createRoot" warning в production
+- [ ] StrictMode отключен в production
+- [ ] Console чистый
+
+### Browser Support
+
+Проверить в:
+- [ ] Chrome (latest)
+- [ ] Firefox (latest)
+- [ ] Safari (latest)
+- [ ] Edge (latest)
+- [ ] Mobile Safari (iOS)
+- [ ] Mobile Chrome (Android)
+
+## 📊 Monitoring
+
+### После деплоя (24 часа)
+
+- [ ] Проверить GitHub Actions history
+- [ ] Нет failed deployments
+- [ ] Codecov coverage обновлен
+- [ ] Нет критичных ошибок в console
+
+### Опционально
+
+- [ ] Настроить error tracking (Sentry)
+- [ ] Настроить analytics (Google Analytics)
+- [ ] Настроить uptime monitoring
+- [ ] Настроить alerts
+
+## 🔄 Rollback Plan
+
+Если что-то пошло не так:
 
 ```bash
-git add .
-git commit -m "Fix: Configure for GitHub Pages deployment"
+# 1. Откатить на предыдущий commit
+git revert HEAD
 git push origin main
+
+# 2. Или force push предыдущей версии
+git reset --hard <previous-commit>
+git push origin main --force
+
+# 3. Или откатить через GitHub
+# Actions → Latest deployment → Re-run previous
 ```
 
-### Шаг 5: Дождитесь деплоя
+## 📝 Post-Deployment Notes
 
-1. Перейдите во вкладку **Actions** в вашем репозитории
-2. Вы увидите workflow "Deploy to GitHub Pages" 🔄
-3. Дождитесь зеленой галочки ✅ (обычно 2-3 минуты)
-4. Ваш сайт будет доступен по адресу:
-   ```
-   https://USERNAME.github.io/REPO-NAME/
-   ```
+**Deployed by:** _____________  
+**Date:** _____________  
+**Version:** _____________  
+**Commit SHA:** _____________  
+
+**Notes:**
+- 
+- 
+- 
+
+**Issues found:**
+- 
+- 
+
+**Action items:**
+- 
+- 
 
 ---
 
-## 🎉 Готово!
-
-После выполнения этих шагов ваш сайт будет работать!
-
----
-
-## 🐛 Если все еще 404
-
-### Проверьте 3 вещи:
-
-1. **Base path в vite.config.ts**
-   - Должен совпадать с именем репозитория
-   - Пример: репо `katia-booking` → `base: '/katia-booking/'`
-
-2. **GitHub Pages Source**
-   - Settings → Pages → Source = `GitHub Actions`
-   - НЕ "Deploy from a branch"
-
-3. **Actions завершился успешно**
-   - Вкладка Actions → зеленая галочка ✅
-   - Если красный крестик ❌ → посмотрите логи
-
-### Быстрый фикс:
+## 🎯 Quick Commands
 
 ```bash
-# 1. Проверьте что base правильный в vite.config.ts
-# 2. Затем:
-git add .
-git commit -m "Fix: Update base path"
-git push origin main
-# 3. Дождитесь нового деплоя (Actions tab)
+# Pre-deploy full check
+npm run ci && npm run build && npm run preview
+
+# Deploy to GitHub Pages
+npm run deploy
+
+# Check deployment status
+gh run list --workflow=ci.yml
+
+# View logs
+gh run view <run-id> --log
+
+# Rollback (осторожно!)
+git revert HEAD && git push
 ```
 
 ---
 
-## 📚 Документация
+**Sign-off:**
 
-- 📖 **Полная инструкция:** `/GITHUB_PAGES_DEPLOY.md`
-- ⚡ **Быстрый гайд:** `/QUICK_DEPLOY_GUIDE.md`
-- 📝 **Этот чеклист:** `/DEPLOYMENT_CHECKLIST.md`
+- [ ] Code reviewed
+- [ ] Tests passed
+- [ ] Deployed successfully
+- [ ] Verified in production
 
----
-
-## 💡 Совет
-
-После первого успешного деплоя:
-- Все последующие пуши в `main` будут автоматически деплоиться
-- Не нужно каждый раз настраивать заново
-- Просто `git push` и сайт обновится через 2-3 минуты
+**Deployer:** _____________ **Date:** _____________
 
 ---
 
-## 🚀 Успехов!
+**Next deployment:** [Link to next checklist]
 
-**Ваш сайт скоро будет онлайн!** 🎉

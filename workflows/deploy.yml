@@ -39,7 +39,7 @@ jobs:
       - name: 🏗️ Build
         run: npm run build
         env:
-          # Frontend Environment Variables (VITE_*)
+          # ⚠️ ВАЖНО: Environment Variables из GitHub Secrets
           # Добавьте эти секреты в: Settings → Secrets and variables → Actions
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
