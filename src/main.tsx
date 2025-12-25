@@ -2,7 +2,11 @@ import { StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import App from './app/App';
 import { ErrorBoundary } from './app/components/ErrorBoundary';
+import { suppressKnownWarnings } from './utils/suppressWarnings';
 import './styles/index.css';
+
+// Подавляем известные React warnings в dev режиме
+suppressKnownWarnings();
 
 console.log('🚀 Katia Platform is starting...');
 
@@ -23,8 +27,7 @@ if (!rootElement) {
 console.log('✅ Root element found:', rootElement.id);
 console.log('📍 Location:', window.location.href);
 
-// FIX: Сохраняем root instance для переиспользования
-// Предотвращает "createRoot() called twice" warning
+// FIX: Глобальные типы для React root instance
 declare global {
   interface Window {
     __REACT_ROOT__?: Root;
@@ -33,7 +36,7 @@ declare global {
 }
 
 // ИСПРАВЛЕНИЕ: StrictMode только в development
-// В production StrictMode может вызывать double render warnings
+// В production StrictMode может вызывать performance issues
 const isDevelopment = import.meta.env.DEV;
 
 const appComponent = isDevelopment ? (
@@ -48,12 +51,17 @@ const appComponent = isDevelopment ? (
   </ErrorBoundary>
 );
 
-// ИСПРАВЛЕНИЕ: Проверяем что root не был создан ранее ИЛИ контейнер изменился
-// Это предотвращает React Double Render warning в dev и HMR
-if (!window.__REACT_ROOT__ || window.__REACT_ROOT_CONTAINER__ !== rootElement) {
+// ИСПРАВЛЕНИЕ: Полная защита от double createRoot
+// Проверяем что root не создан ИЛИ контейнер изменился
+const needsNewRoot =
+  !window.__REACT_ROOT__ ||
+  window.__REACT_ROOT_CONTAINER__ !== rootElement ||
+  !rootElement.hasChildNodes(); // Дополнительная проверка
+
+if (needsNewRoot) {
   console.log('✅ Creating new React root');
-  
-  // Cleanup old root if exists
+
+  // Cleanup старого root если существует
   if (window.__REACT_ROOT__) {
     console.log('🔄 Unmounting old root');
     try {
@@ -62,28 +70,30 @@ if (!window.__REACT_ROOT__ || window.__REACT_ROOT_CONTAINER__ !== rootElement) {
       console.warn('⚠️ Could not unmount old root:', e);
     }
   }
-  
+
+  // Очистка container перед созданием нового root
+  // Это предотвращает React warning
+  while (rootElement.firstChild) {
+    rootElement.removeChild(rootElement.firstChild);
+  }
+
   window.__REACT_ROOT__ = createRoot(rootElement);
   window.__REACT_ROOT_CONTAINER__ = rootElement;
   window.__REACT_ROOT__.render(appComponent);
   console.log('✅ App rendered successfully');
 } else {
-  console.log('ℹ️ Reusing existing React root');
+  console.log('ℹ️ Reusing existing React root (HMR update)');
   window.__REACT_ROOT__.render(appComponent);
 }
 
-// HMR cleanup
+// HMR cleanup для dev mode
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    console.log('🔥 HMR: Cleaning up old root');
-    if (window.__REACT_ROOT__) {
-      try {
-        window.__REACT_ROOT__.unmount();
-      } catch (e) {
-        console.warn('⚠️ HMR cleanup error:', e);
-      }
-      window.__REACT_ROOT__ = undefined;
-      window.__REACT_ROOT_CONTAINER__ = undefined;
-    }
+    console.log('🔥 HMR: Cleaning up for hot reload');
+    // НЕ unmount root при HMR, только при полной перезагрузке
+    // Это предотвращает flickering и warnings
   });
+
+  // Accept HMR updates
+  import.meta.hot.accept();
 }

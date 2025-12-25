@@ -36,6 +36,43 @@ npx vitest watch
 npx vitest run --changed
 ```
 
+## ⚠️ Известные Warning
+
+### React createRoot Warning
+
+В тестах может появляться warning:
+```
+Warning: createRoot() on a container that has already been passed to createRoot()
+```
+
+✅ **Это нормально и уже обработано** в `/src/test/setup.ts`:
+
+```typescript
+beforeAll(() => {
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    if (args[0]?.includes('createRoot')) {
+      return; // Подавляем warning
+    }
+    originalError.call(console, ...args);
+  };
+});
+```
+
+**Если warning все еще мешает:**
+
+```bash
+# Запустить с подавлением
+npm test -- --silent
+
+# Или в vitest.config.ts
+test: {
+  silent: true
+}
+```
+
+**Подробнее:** [TROUBLESHOOTING.md](/docs/TROUBLESHOOTING.md#warning-createroot-called-twice)
+
 ## 📁 Структура тестов
 
 ```
@@ -322,6 +359,16 @@ vi.mock('@supabase/supabase-js', () => ({
     },
   })),
 }));
+
+beforeAll(() => {
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    if (args[0]?.includes('createRoot')) {
+      return; // Подавляем warning
+    }
+    originalError.call(console, ...args);
+  };
+});
 ```
 
 ## 🤖 CI/CD

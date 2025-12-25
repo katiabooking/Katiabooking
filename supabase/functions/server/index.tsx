@@ -15,6 +15,7 @@ import bookingWorkflowRoutes from "./bookingWorkflowRoutes.ts";
 import realtimeSlotsRoutes from "./realtimeSlots.ts";
 import paymentTrackingRoutes from "./paymentTracking.ts";
 import certificateRedemptionRoutes from "./certificateRedemption.ts";
+import storageRoutes from "./storage-routes.ts";
 import { sendBookingReminders } from "./notifications.tsx";
 
 const app = new Hono();
@@ -77,6 +78,9 @@ app.route("/", paymentTrackingRoutes);
 
 // Mount certificate redemption routes ⭐ NEW
 app.route("/", certificateRedemptionRoutes);
+
+// Mount storage routes ⭐ NEW
+app.route("/", storageRoutes);
 
 // ============================================
 // NOTIFICATIONS SCHEDULER

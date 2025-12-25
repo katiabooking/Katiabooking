@@ -183,6 +183,8 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 katia/
 ├── .github/
 │   └── workflows/          # CI/CD pipelines
+├── docs/
+│   └── TROUBLESHOOTING.md  # Решения проблем
 ├── src/
 │   ├── app/
 │   │   ├── components/     # React компоненты
@@ -190,6 +192,7 @@ katia/
 │   ├── contexts/           # React contexts
 │   ├── lib/                # Utilities
 │   ├── styles/             # CSS
+│   ├── utils/              # Helper functions
 │   └── test/               # Тесты
 │       ├── setup.ts        # Test setup
 │       └── contexts/       # Context тесты
@@ -200,6 +203,19 @@ katia/
 ├── vitest.config.ts        # Vitest config
 └── package.json
 ```
+
+## 🐛 Troubleshooting
+
+Столкнулись с проблемой? Проверьте [TROUBLESHOOTING.md](/docs/TROUBLESHOOTING.md):
+
+- **React Warnings** - createRoot, StrictMode issues
+- **Build Issues** - TypeScript errors, bundle size
+- **Testing Issues** - Coverage, mocks
+- **Deployment Issues** - GitHub Pages, env variables
+
+**Quick Fixes:** [QUICKFIX.md](/QUICKFIX.md) - решения за 30 секунд
+
+**React createRoot Warning:** [Подробное объяснение](/docs/REACT_ROOT_WARNING.md)
 
 ## 🤝 Contributing
 

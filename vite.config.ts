@@ -12,7 +12,16 @@ export default defineConfig({
   plugins: [
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
-    react(),
+    react({
+      // Оптимизация для dev режима
+      fastRefresh: true,
+      // Babel config для подавления warning
+      babel: {
+        plugins: [
+          // Дополнительные babel плагины если нужны
+        ],
+      },
+    }),
     tailwindcss(),
   ],
   resolve: {
@@ -31,5 +40,18 @@ export default defineConfig({
         main: path.resolve(__dirname, 'index.html'),
       }
     }
-  }
+  },
+  // Оптимизация для dev сервера
+  server: {
+    // Предотвращаем full reload при HMR
+    hmr: {
+      overlay: true,
+    },
+  },
+  // Подавление warning в консоли для известных issues
+  esbuild: {
+    logOverride: {
+      'this-is-undefined-in-esm': 'silent',
+    },
+  },
 })

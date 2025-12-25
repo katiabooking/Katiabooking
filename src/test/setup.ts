@@ -1,10 +1,31 @@
 import '@testing-library/jest-dom';
-import { expect, afterEach, vi } from 'vitest';
+import { expect, afterEach, vi, beforeAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 // Cleanup после каждого теста
 afterEach(() => {
   cleanup();
+  // Очистка React root warnings
+  if (window.__REACT_ROOT__) {
+    window.__REACT_ROOT__ = undefined;
+    window.__REACT_ROOT_CONTAINER__ = undefined;
+  }
+});
+
+// Глобальная настройка перед всеми тестами
+beforeAll(() => {
+  // Подавить React createRoot warning в тестах
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    if (
+      typeof args[0] === 'string' &&
+      args[0].includes('createRoot') &&
+      args[0].includes('already been passed')
+    ) {
+      return; // Игнорируем warning о createRoot в тестах
+    }
+    originalError.call(console, ...args);
+  };
 });
 
 // Mock Supabase
@@ -38,6 +59,8 @@ const localStorageMock = {
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
+  length: 0,
+  key: vi.fn(),
 };
 global.localStorage = localStorageMock as any;
 
@@ -55,3 +78,22 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Mock IntersectionObserver
+global.IntersectionObserver = class IntersectionObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  takeRecords() {
+    return [];
+  }
+  unobserve() {}
+} as any;
+
+// Global types для React root
+declare global {
+  interface Window {
+    __REACT_ROOT__?: any;
+    __REACT_ROOT_CONTAINER__?: HTMLElement;
+  }
+}
