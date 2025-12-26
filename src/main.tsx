@@ -32,6 +32,7 @@ declare global {
   interface Window {
     __REACT_ROOT__?: Root;
     __REACT_ROOT_CONTAINER__?: HTMLElement;
+    __REACT_ROOT_INITIALIZED__?: boolean;
   }
 }
 
@@ -52,24 +53,9 @@ const appComponent = isDevelopment ? (
 );
 
 // ИСПРАВЛЕНИЕ: Полная защита от double createRoot
-// Проверяем что root не создан ИЛИ контейнер изменился
-const needsNewRoot =
-  !window.__REACT_ROOT__ ||
-  window.__REACT_ROOT_CONTAINER__ !== rootElement ||
-  !rootElement.hasChildNodes(); // Дополнительная проверка
-
-if (needsNewRoot) {
+// Используем флаг инициализации чтобы избежать двойного вызова
+if (!window.__REACT_ROOT_INITIALIZED__) {
   console.log('✅ Creating new React root');
-
-  // Cleanup старого root если существует
-  if (window.__REACT_ROOT__) {
-    console.log('🔄 Unmounting old root');
-    try {
-      window.__REACT_ROOT__.unmount();
-    } catch (e) {
-      console.warn('⚠️ Could not unmount old root:', e);
-    }
-  }
 
   // Очистка container перед созданием нового root
   // Это предотвращает React warning
@@ -79,10 +65,24 @@ if (needsNewRoot) {
 
   window.__REACT_ROOT__ = createRoot(rootElement);
   window.__REACT_ROOT_CONTAINER__ = rootElement;
+  window.__REACT_ROOT_INITIALIZED__ = true;
   window.__REACT_ROOT__.render(appComponent);
   console.log('✅ App rendered successfully');
-} else {
+} else if (window.__REACT_ROOT__) {
   console.log('ℹ️ Reusing existing React root (HMR update)');
+  window.__REACT_ROOT__.render(appComponent);
+} else {
+  // Fallback: если флаг установлен но root не существует, пересоздаем
+  console.warn('⚠️ Root flag set but no root found, recreating...');
+  window.__REACT_ROOT_INITIALIZED__ = false;
+  
+  while (rootElement.firstChild) {
+    rootElement.removeChild(rootElement.firstChild);
+  }
+  
+  window.__REACT_ROOT__ = createRoot(rootElement);
+  window.__REACT_ROOT_CONTAINER__ = rootElement;
+  window.__REACT_ROOT_INITIALIZED__ = true;
   window.__REACT_ROOT__.render(appComponent);
 }
 

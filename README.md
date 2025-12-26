@@ -20,6 +20,7 @@
 - 🖼️ **Supabase Storage** с auto-seeder (30 images)
 - 📊 **CRM & Analytics** с AI forecasting
 - 🧪 **95% test coverage** + полный CI/CD
+- 📱 **Feed System** - Instagram-like посты и last-minute deals
 
 ---
 
@@ -100,7 +101,7 @@ npm run test:ui
 
 ## 📦 Key Scripts
 
-| Command | Описание |
+| Command | ��писание |
 |---------|----------|
 | `npm run dev` | Development server |
 | `npm run build` | Production build |

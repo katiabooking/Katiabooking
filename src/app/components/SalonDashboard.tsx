@@ -1,49 +1,5 @@
-import { useState } from 'react';
-import {
-  Calendar,
-  Users,
-  DollarSign,
-  TrendingUp,
-  Settings,
-  BarChart3,
-  MessageSquare,
-  Sparkles,
-  UserPlus,
-  Download,
-  Upload,
-  Scissors,
-  Image as ImageIcon,
-  Bell,
-  LogOut,
-  CreditCard,
-  Target,
-  Package,
-  Camera,
-  Star,
-  Gift,
-  Clock,
-  Brain,
-  Zap,
-  RefreshCw,
-  Store,
-} from 'lucide-react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader } from './ui/card';
-import { SalonSwitcher } from './SalonSwitcher';
-import { InviteStaffModal } from './InviteStaffModal';
-import { DataExportImport } from './DataExportImport';
-import { SalonSettingsTab } from './SalonSettingsTab';
-import { CheckoutModal } from './CheckoutModal';
-import { PackageDealsTab } from './PackageDealsTab';
-import { DynamicPricingTab } from './DynamicPricingTab';
-import { ReferralProgramTab } from './ReferralProgramTab';
-import { AISmartFillingTab } from './AISmartFillingTab';
-import { AdvancedForecastingTab } from './AdvancedForecastingTab';
-import { BookingSettingsTab } from './BookingSettingsTab';
-import { GiftCardsTab } from './GiftCardsTab';
-import { MultiSalonManager } from './MultiSalonManager';
-import { AddSalonModal } from './AddSalonModal';
 import { FavoritesAnalytics } from './FavoritesAnalytics';
+import { FeedAnalytics } from './FeedAnalytics';
 import type { User, UserRole, Salon, Booking, Client } from '../../types/roles';
 import { PERMISSIONS, hasPermission } from '../../types/roles';
 
@@ -115,7 +71,7 @@ export function SalonDashboard({
       { id: 'gift-cards', icon: Gift, label: '🎁 Gift Cards', roles: ['owner', 'admin'] },
       { id: 'referral-program', icon: Gift, label: '💝 Referral Program', roles: ['owner'] },
       { id: 'ai-smart-filling', icon: Brain, label: '🤖 AI Smart Filling', roles: ['owner'] },
-      { id: 'advanced-forecasting', icon: Zap, label: '��� Forecasting', roles: ['owner'] },
+      { id: 'advanced-forecasting', icon: Zap, label: ' Forecasting', roles: ['owner'] },
       { id: 'booking-settings', icon: Settings, label: '⚙️ Booking Settings', roles: ['owner'] },
       
       { id: 'products', icon: Package, label: 'Products', roles: ['admin'] },
@@ -127,6 +83,7 @@ export function SalonDashboard({
       { id: 'expense', icon: DollarSign, label: 'Expenses', roles: ['owner'] },
       { id: 'loyalty', icon: Gift, label: 'Loyalty Program', roles: ['owner'] },
       { id: 'advanced-analytics', icon: BarChart3, label: 'Advanced Analytics', roles: ['owner'] },
+      { id: 'feed-analytics', icon: TrendingUp, label: 'Feed Analytics', roles: ['owner', 'admin'] },
       { id: 'notifications', icon: Bell, label: 'Notifications', roles: ['owner', 'admin', 'master'] },
       { id: 'waiting-list', icon: Clock, label: 'Waiting List', roles: ['owner', 'admin'] },
       { id: 'media', icon: ImageIcon, label: 'Photos & Gallery', roles: ['owner'] },
@@ -522,6 +479,20 @@ export function SalonDashboard({
                       </button>
                     )}
 
+                    {/* Feed Analytics */}
+                    {currentUser.role === 'owner' && (
+                      <button
+                        onClick={() => setActiveTab('feed-analytics')}
+                        className="rounded-xl p-6 text-left transition-all border bg-white hover:shadow-lg border-gray-100 cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 bg-indigo-100">
+                          <TrendingUp className="w-6 h-6 text-indigo-600" />
+                        </div>
+                        <h3 className="font-bold mb-1 text-gray-900">Feed Analytics</h3>
+                        <p className="text-sm text-gray-500">Analyze feed performance</p>
+                      </button>
+                    )}
+
                     {/* Notifications */}
                     <button
                       onClick={() => setActiveTab('notifications')}
@@ -909,6 +880,16 @@ export function SalonDashboard({
         return (
           <div className="space-y-6">
             <FavoritesAnalytics
+              salonId={currentSalon?.id}
+              salonName={currentSalon?.name}
+            />
+          </div>
+        );
+
+      case 'feed-analytics':
+        return (
+          <div className="space-y-6">
+            <FeedAnalytics
               salonId={currentSalon?.id}
               salonName={currentSalon?.name}
             />

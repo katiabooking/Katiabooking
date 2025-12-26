@@ -59,27 +59,28 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
   });
 
   // Инициализируем с fallback курсами сразу, чтобы избежать ошибок
+  // ВАЖНО: Курсы показывают сколько AED за 1 единицу валюты
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({
     AED: 1,
-    USD: 0.272,
-    EUR: 0.251,
-    GBP: 0.215,
-    RUB: 25.2,
-    TRY: 8.94,
-    SAR: 1.02,
-    QAR: 0.99,
-    KWD: 0.084,
-    BHD: 0.103,
-    OMR: 0.105,
-    EGP: 13.21,
-    JPY: 40.7,
-    CNY: 1.97,
-    INR: 22.66,
-    CAD: 0.37,
-    AUD: 0.417,
-    CHF: 0.24,
-    PLN: 1.1,
-    UAH: 10.95,
+    USD: 3.67,      // 1 USD = 3.67 AED
+    EUR: 3.98,      // 1 EUR = 3.98 AED  
+    GBP: 4.65,      // 1 GBP = 4.65 AED
+    RUB: 0.0397,    // 1 RUB = 0.0397 AED
+    TRY: 0.112,     // 1 TRY = 0.112 AED
+    SAR: 0.98,      // 1 SAR = 0.98 AED
+    QAR: 1.01,      // 1 QAR = 1.01 AED
+    KWD: 11.90,     // 1 KWD = 11.90 AED
+    BHD: 9.71,      // 1 BHD = 9.71 AED
+    OMR: 9.52,      // 1 OMR = 9.52 AED
+    EGP: 0.076,     // 1 EGP = 0.076 AED
+    JPY: 0.0246,    // 1 JPY = 0.0246 AED
+    CNY: 0.508,     // 1 CNY = 0.508 AED
+    INR: 0.0442,    // 1 INR = 0.0442 AED
+    CAD: 2.70,      // 1 CAD = 2.70 AED
+    AUD: 2.40,      // 1 AUD = 2.40 AED
+    CHF: 4.17,      // 1 CHF = 4.17 AED
+    PLN: 0.91,      // 1 PLN = 0.91 AED
+    UAH: 0.091,     // 1 UAH = 0.091 AED
   });
   const [loading, setLoading] = useState(true);
 
@@ -91,58 +92,52 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
         
         // Попробуем несколько бесплатных API по очереди
         const apis = [
-          // API 1: Frankfurter (бесплатный, от ЕЦБ) - запрашиваем с EUR и пересчитываем
+          // API 1: Frankfurter (бесплатный, от ЕЦБ) - запрашиваем с AED напрямую
           async () => {
-            const response = await fetch('https://api.frankfurter.app/latest?from=EUR');
+            const response = await fetch('https://api.frankfurter.app/latest?from=AED');
             if (!response.ok) throw new Error('Frankfurter API failed');
             const data = await response.json();
             
-            // Пересчитываем все курсы относительно AED
-            const eurToAed = 1 / (data.rates.AED || 0.251); // EUR -> AED
+            // Инвертируем курсы: API даёт "1 AED = X валюты", нам нужно "1 валюта = X AED"
             const rates: ExchangeRates = { AED: 1 };
             
-            // Конвертируем каждую валюту: EUR -> Currency -> AED
             Object.keys(data.rates).forEach(code => {
-              rates[code] = data.rates[code] * eurToAed;
+              // Инвертируем: если 1 AED = 0.27 USD, то 1 USD = 1/0.27 = 3.7 AED
+              rates[code] = 1 / data.rates[code];
             });
-            rates.EUR = eurToAed; // Добавляем EUR
             
             return rates;
           },
           
-          // API 2: Exchangerate.host (бесплатный, без ключа)
+          // API 2: Exchangerate.host (бесплатный, без ключа) - запрашиваем с AED
           async () => {
-            const response = await fetch('https://api.exchangerate.host/latest?base=USD');
+            const response = await fetch('https://api.exchangerate.host/latest?base=AED');
             if (!response.ok) throw new Error('Exchangerate.host API failed');
             const data = await response.json();
             
-            // Пересчитываем все курсы относительно AED
-            const usdToAed = 1 / (data.rates.AED || 0.272); // USD -> AED
+            // Инвертируем курсы
             const rates: ExchangeRates = { AED: 1 };
             
             Object.keys(data.rates).forEach(code => {
-              rates[code] = data.rates[code] * usdToAed;
+              rates[code] = 1 / data.rates[code];
             });
-            rates.USD = usdToAed;
             
             return rates;
           },
           
-          // API 3: Floatrates (бесплатный, без ключа, JSON формат)
+          // API 3: Floatrates (бесплатный) - запрашиваем с AED
           async () => {
-            const response = await fetch('https://www.floatrates.com/daily/usd.json');
+            const response = await fetch('https://www.floatrates.com/daily/aed.json');
             if (!response.ok) throw new Error('Floatrates API failed');
             const data = await response.json();
             
-            // Пересчитываем все курсы относительно AED
-            const usdToAed = data.aed ? 1 / data.aed.rate : 3.67; // USD -> AED
-            const rates: ExchangeRates = { AED: 1, USD: usdToAed };
+            // Floatrates даёт прямые курсы от AED
+            const rates: ExchangeRates = { AED: 1 };
             
             Object.keys(data).forEach(key => {
               const code = key.toUpperCase();
-              if (code !== 'AED') {
-                rates[code] = data[key].rate * usdToAed;
-              }
+              // data[key].rate показывает "1 AED = X валюты", инвертируем
+              rates[code] = 1 / data[key].rate;
             });
             
             return rates;
@@ -163,7 +158,7 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
             if (i < apis.length - 1) {
               console.log(`ℹ️ API ${i + 1} unavailable, trying alternative...`);
             }
-            continue; // Пробуем следующий API
+            continue; // Пр��буем следующий API
           }
         }
 
@@ -171,29 +166,30 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
         throw lastError || new Error('All APIs unavailable');
 
       } catch (error) {
-        console.log('ℹ️ Using offline exchange rates (last updated: 25.12.2024)');
-        // Fallback курсы если все API не доступны (обновлено 25.12.2024)
+        console.log('ℹ️ Using offline exchange rates (last updated: 26.12.2024)');
+        // Fallback курсы если все API не доступны
+        // ВАЖНО: Курсы показывают сколько AED за 1 единицу валюты
         setExchangeRates({
           AED: 1,
-          USD: 0.272,
-          EUR: 0.251,
-          GBP: 0.215,
-          RUB: 25.2,
-          TRY: 8.94,
-          SAR: 1.02,
-          QAR: 0.99,
-          KWD: 0.084,
-          BHD: 0.103,
-          OMR: 0.105,
-          EGP: 13.21,
-          JPY: 40.7,
-          CNY: 1.97,
-          INR: 22.66,
-          CAD: 0.37,
-          AUD: 0.417,
-          CHF: 0.24,
-          PLN: 1.1,
-          UAH: 10.95,
+          USD: 3.67,      // 1 USD = 3.67 AED
+          EUR: 3.98,      // 1 EUR = 3.98 AED  
+          GBP: 4.65,      // 1 GBP = 4.65 AED
+          RUB: 0.0397,    // 1 RUB = 0.0397 AED
+          TRY: 0.112,     // 1 TRY = 0.112 AED
+          SAR: 0.98,      // 1 SAR = 0.98 AED
+          QAR: 1.01,      // 1 QAR = 1.01 AED
+          KWD: 11.90,     // 1 KWD = 11.90 AED
+          BHD: 9.71,      // 1 BHD = 9.71 AED
+          OMR: 9.52,      // 1 OMR = 9.52 AED
+          EGP: 0.076,     // 1 EGP = 0.076 AED
+          JPY: 0.0246,    // 1 JPY = 0.0246 AED
+          CNY: 0.508,     // 1 CNY = 0.508 AED
+          INR: 0.0442,    // 1 INR = 0.0442 AED
+          CAD: 2.70,      // 1 CAD = 2.70 AED
+          AUD: 2.40,      // 1 AUD = 2.40 AED
+          CHF: 4.17,      // 1 CHF = 4.17 AED
+          PLN: 0.91,      // 1 PLN = 0.91 AED
+          UAH: 0.091,     // 1 UAH = 0.091 AED
         });
       } finally {
         setLoading(false);
@@ -212,7 +208,9 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
     localStorage.setItem('katia-currency', JSON.stringify(newCurrency));
   };
 
-  // Конвертация цены из AED (базовая валюта) в выбранную
+  // Конвертация цены из любой валюты в выбранную
+  // exchangeRates хранят: сколько AED за 1 единицу валюты
+  // Например: EUR: 3.98 означает 1 EUR = 3.98 AED
   const convertPrice = (price: number, fromCurrency: string = 'AED'): number => {
     // Защита от undefined или пустых курсов
     if (!exchangeRates || Object.keys(exchangeRates).length === 0) {
@@ -223,9 +221,11 @@ export function CurrencyProvider({ children }: CurrencyProviderProps) {
       return price;
     }
 
-    // Сначала конвертируем в AED, затем в целевую валюту
-    const priceInAED = price / exchangeRates[fromCurrency];
-    const convertedPrice = priceInAED * exchangeRates[currency.code];
+    // Шаг 1: Конвертируем в AED (умножаем на курс исходной валюты)
+    const priceInAED = price * exchangeRates[fromCurrency];
+    
+    // Шаг 2: Конвертируем из AED в целевую валюту (делим на курс целевой валюты)
+    const convertedPrice = priceInAED / exchangeRates[currency.code];
 
     return Math.round(convertedPrice * 100) / 100;
   };

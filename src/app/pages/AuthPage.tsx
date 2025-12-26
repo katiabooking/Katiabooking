@@ -1,8 +1,17 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Separator } from '../components/ui/separator';
+import { Mail, Lock, User, Phone, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -380,7 +389,7 @@ export function AuthPage() {
                       <Input
                         id="register-password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="•••••••��"
+                        placeholder="•••••••"
                         className="pl-10 pr-10 h-11"
                         value={registerPassword}
                         onChange={(e) => setRegisterPassword(e.target.value)}
@@ -458,8 +467,6 @@ export function AuthPage() {
           <a href="#" className="underline">Terms of Service</a> apply.
         </p>
       </div>
-      
-      <Footer />
     </div>
   );
 }

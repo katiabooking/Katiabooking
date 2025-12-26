@@ -9,6 +9,7 @@ import { useIsMobile } from './ui/use-mobile';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
+import { ShareModal } from './ShareModal';
 
 interface SalonCardProps {
   salon: Salon;
@@ -19,6 +20,7 @@ export function SalonCard({ salon }: SalonCardProps) {
   const isMobile = useIsMobile();
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   
   // Toggle favorite
   const toggleFavorite = async (e: React.MouseEvent) => {
@@ -56,28 +58,10 @@ export function SalonCard({ salon }: SalonCardProps) {
   };
   
   // Share salon
-  const shareSalon = async (e: React.MouseEvent) => {
+  const shareSalon = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const shareData = {
-      title: salon.name,
-      text: `Check out ${salon.name} on Katia! ${salon.rating}⭐ rated salon in ${salon.location}`,
-      url: `${window.location.origin}/salon/${salon.id}`,
-    };
-    
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        toast.success('Shared successfully!');
-      } else {
-        // Fallback: Copy to clipboard
-        await navigator.clipboard.writeText(shareData.url);
-        toast.success('Link copied to clipboard!');
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
+    setIsShareModalOpen(true);
   };
   
   return (
@@ -219,6 +203,16 @@ export function SalonCard({ salon }: SalonCardProps) {
           {salon.reviewCount} reviews
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        title="Share Salon"
+        description={`Share ${salon.name} with your friends`}
+        shareUrl={`${window.location.origin}/salon/${salon.id}`}
+        shareText={`Check out ${salon.name} on Katia! ${salon.rating}⭐ rated salon in ${salon.location}`}
+      />
     </Card>
   );
 }

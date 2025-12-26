@@ -34,6 +34,7 @@ import { SuperAdminDashboard } from './pages/SuperAdminDashboard';
 import { SuperAdminLeadsPage } from './pages/SuperAdminLeadsPage';
 import { SalonProfilePage } from './pages/SalonProfilePage';
 import { BookingFlowPage } from './pages/BookingFlowPage';
+import { FeedPage } from './pages/FeedPage';
 import { RoleBasedRedirect } from './pages/RoleBasedRedirect';
 import { BlockedSalonDemo } from './pages/BlockedSalonDemo';
 
@@ -80,6 +81,12 @@ export default function App() {
     console.log('   • Demo Page: ' + window.location.origin + '/#/image-storage-demo');
     console.log('   • Status: Ready for bucket initialization');
     console.log('   • Image Seeder: 30 demo images ready to upload\n');
+    
+    // Feed System
+    console.log('📱 Beauty Feed System:');
+    console.log('   • Feed Page: ' + window.location.origin + '/#/feed');
+    console.log('   • Features: Posts, Last-Minute Deals, Like System');
+    console.log('   • Demo Posts: Available (click "Load Demo Posts" button)\\n');
   }, []);
 
   return (
@@ -103,6 +110,7 @@ export default function App() {
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/support" element={<ContactPage />} />
                       <Route path="/salons" element={<SalonListingPage />} />
+                      <Route path="/feed" element={<FeedPage />} />
                       <Route path="/dashboard" element={<DashboardSelector />} />
                       <Route path="/owner" element={<OwnerDashboard />} />
                       <Route path="/admin" element={<AdminDashboard />} />
