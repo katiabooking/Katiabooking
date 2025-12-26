@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { X, CreditCard, Smartphone, Check, AlertCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
-import logo from 'figma:asset/25258f08dbfd42d534e2cc2de58e6a86631a05a5.png';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+
+const logo = "/icons/logo.png";
 
 interface PaymentModalProps {
   isOpen: boolean;

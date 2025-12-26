@@ -16,7 +16,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import logo from 'figma:asset/25258f08dbfd42d534e2cc2de58e6a86631a05a5.png';
+
+const logo = "/icons/logo.png";
 
 export function Header() {
   const location = useLocation();

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { X, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { Button } from './ui/button';
-import logo from 'figma:asset/25258f08dbfd42d534e2cc2de58e6a86631a05a5.png';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
@@ -13,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
+
+const logo = "/icons/logo.png";
 
 interface SalonOnboardingModalProps {
   isOpen: boolean;

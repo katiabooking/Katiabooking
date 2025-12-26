@@ -51,7 +51,8 @@ import { NotificationsFullPage } from './NotificationsFullPage';
 import { WaitingListTab } from './WaitingListTab';
 import { MasterDashboard } from '../pages/MasterDashboard';
 import { useCurrency, CURRENCIES } from '../../contexts/CurrencyContext';
-import logo from 'figma:asset/25258f08dbfd42d534e2cc2de58e6a86631a05a5.png';
+
+const logo = "/icons/logo.png";
 
 interface DemoModalProps {
   isOpen: boolean;

@@ -6,7 +6,8 @@ import { Separator } from './ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { promptInstall, canInstall, isStandalone, getPlatform } from '../../utils/pwaUtils';
 import { useState } from 'react';
-import logo from 'figma:asset/25258f08dbfd42d534e2cc2de58e6a86631a05a5.png';
+
+const logo = "/icons/logo.png";
 
 interface MobileMenuDrawerProps {
   isOpen: boolean;
