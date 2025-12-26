@@ -18,10 +18,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: 📥 Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          npm install --legacy-peer-deps
+          chmod +x node_modules/.bin/*
 
       - name: 🔍 ESLint check
         run: npm run lint
@@ -52,10 +53,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: 📥 Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          npm install --legacy-peer-deps
+          chmod +x node_modules/.bin/*
 
       - name: 🧪 Run auth tests only
         run: npx vitest run src/test/contexts/AuthContext.test.tsx
