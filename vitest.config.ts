@@ -1,57 +1,35 @@
-import { defineConfig } from 'vite'
-import path from 'path'
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
-
-// Плагин для обработки Figma assets
-function figmaAssetsPlugin(): any {
-  return {
-    name: 'vite-plugin-figma-assets',
-    enforce: 'pre' as const,
-    resolveId(id: string) {
-      if (id.startsWith('figma:asset/')) {
-        return id;
-      }
-    },
-    load(id: string) {
-      if (id.startsWith('figma:asset/')) {
-        // Возвращаем пустую data URL картинку
-        return 'export default "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="';
-      }
-    },
-  };
-}
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
-  base: '/Katiabooking/',
-  
-  plugins: [
-    figmaAssetsPlugin(),
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [react() as any],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-  publicDir: 'public',
-  build: {
-    copyPublicDir: true,
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'index.html'),
-      }
-    }
-  },
-  server: {
-    hmr: {
-      overlay: true,
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
+    },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/mockData',
+        'src/main.tsx',
+      ],
     },
   },
-  esbuild: {
-    logOverride: {
-      'this-is-undefined-in-esm': 'silent',
-    },
-  },
-})
+});
