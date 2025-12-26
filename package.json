@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "npx vite build",
-    "preview": "vite preview",
+    "preview": "npx vite preview",
     "deploy": "npm run build && gh-pages -d dist",
-    "dev": "vite",
+    "dev": "npx vite",
     "test": "node node_modules/vitest/vitest.mjs",
     "test:ui": "node node_modules/vitest/vitest.mjs --ui",
     "test:coverage": "node node_modules/vitest/vitest.mjs --coverage",
