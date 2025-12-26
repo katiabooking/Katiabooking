@@ -183,7 +183,7 @@ export function EmailCampaignManagerWithRoles() {
   // Calculate recipients based on role targeting
   const calculateRecipients = () => {
     let count = 0;
-    let breakdown = { owners: 0, admins: 0, masters: 0, leads: 0 };
+    const breakdown = { owners: 0, admins: 0, masters: 0, leads: 0 };
 
     switch (roleTargeting) {
       case 'owners_only':
