@@ -3,37 +3,38 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+// Плагин для обработки Figma assets
+function figmaAssetsPlugin(): any {
+  return {
+    name: 'vite-plugin-figma-assets',
+    resolveId(id: string) {
+      if (id.startsWith('figma:asset/')) {
+        return id;
+      }
+    },
+    load(id: string) {
+      if (id.startsWith('figma:asset/')) {
+        return 'export default ""';
+      }
+    },
+  };
+}
+
 export default defineConfig({
-  // ВАЖНО: Для GitHub Pages - замените 'repo-name' на имя вашего репозитория
-  // Например, если репозиторий github.com/username/katia-booking, то base: '/katia-booking/'
-  // Если используете custom domain (example.com), установите base: '/'
-  base: './',
+  base: '/Katiabooking/',
   
   plugins: [
-    // The React and Tailwind plugins are both required for Make, even if
-    // Tailwind is not being actively used – do not remove them
-    react({
-      // Оптимизация для dev режима
-      fastRefresh: true,
-      // Babel config для подавления warning
-      babel: {
-        plugins: [
-          // Дополнительные babel плагины если нужны
-        ],
-      },
-    }),
+    react(),
     tailwindcss(),
+    figmaAssetsPlugin(),
   ],
   resolve: {
     alias: {
-      // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // Убеждаемся что public файлы копируются корректно
   publicDir: 'public',
   build: {
-    // Копируем service worker и другие статические файлы
     copyPublicDir: true,
     rollupOptions: {
       input: {
@@ -41,14 +42,11 @@ export default defineConfig({
       }
     }
   },
-  // Оптимизация для dev сервера
   server: {
-    // Предотвращаем full reload при HMR
     hmr: {
       overlay: true,
     },
   },
-  // Подавление warning в консоли для известных issues
   esbuild: {
     logOverride: {
       'this-is-undefined-in-esm': 'silent',
