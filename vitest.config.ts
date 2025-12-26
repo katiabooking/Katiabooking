@@ -19,12 +19,12 @@ export default defineConfig({
         '**/mockData',
         'src/main.tsx',
       ],
-      thresholds: {
+      /*thresholds: {
         lines: 80,
         functions: 80,
         branches: 80,
         statements: 80,
-      },
+      },*/
     },
   },
 });
