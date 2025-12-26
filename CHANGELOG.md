@@ -76,8 +76,8 @@
   "test": "vitest",
   "test:ui": "vitest --ui",
   "test:coverage": "vitest --coverage",
-  "lint": "eslint . --ext .ts,.tsx",
-  "lint:fix": "eslint . --ext .ts,.tsx --fix",
+  "lint": "eslint .",
+  "lint:fix": "eslint .",
   "format": "prettier --write",
   "format:check": "prettier --check",
   "ci": "npm run lint && npm run format:check && npm run test:coverage"
