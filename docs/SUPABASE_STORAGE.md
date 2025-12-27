@@ -167,7 +167,7 @@ const response = await fetch(`${SERVER_URL}/storage/upload`, {
 {
   "filePath": "logos/1735132800000-abc123.png",
   "publicUrl": "https://your-project.supabase.co/storage/v1/object/public/katia-images/logos/1735132800000-abc123.png",
-  "fileName": "logo.png",
+  "fileName": "logo.svg",
   "size": 12345,
   "type": "image/png"
 }

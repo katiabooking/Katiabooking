@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { promptInstall, canInstall, isStandalone, getPlatform } from '../../utils/pwaUtils';
 import { useState } from 'react';
 
-const logo = "/icons/logo.png";
+const logo = "/icons/logo.svg";
 
 interface MobileMenuDrawerProps {
   isOpen: boolean;

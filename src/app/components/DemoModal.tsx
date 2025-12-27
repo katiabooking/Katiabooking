@@ -52,7 +52,7 @@ import { WaitingListTab } from './WaitingListTab';
 import { MasterDashboard } from '../pages/MasterDashboard';
 import { useCurrency, CURRENCIES } from '../../contexts/CurrencyContext';
 
-const logo = "/icons/logo.png";
+const logo = "/icons/logo.svg";
 
 interface DemoModalProps {
   isOpen: boolean;

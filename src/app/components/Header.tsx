@@ -17,7 +17,7 @@ import {
 } from './ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
-const logo = "/icons/logo.png";
+const logo = "/icons/logo.svg";
 
 export function Header() {
   const location = useLocation();

@@ -5,7 +5,7 @@ import { Card } from './ui/card';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
 
-const logo = "/icons/logo.png";
+const logo = "/icons/logo.svg";
 
 interface PaymentModalProps {
   isOpen: boolean;

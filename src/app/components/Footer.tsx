@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-const logo = "/icons/logo.png";
+const logo = "/icons/logo.svg";
 
 export function Footer() {
   return (
