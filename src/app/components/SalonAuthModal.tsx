@@ -6,7 +6,6 @@ import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUserRole } from '../../utils/salonRoles';
 import { toast } from 'sonner';
 
 interface SalonAuthModalProps {
@@ -27,70 +26,39 @@ export function SalonAuthModal({ isOpen, onClose }: SalonAuthModalProps) {
 
   const handleGoogleAuth = async () => {
     setIsLoading(true);
-    const { data, error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle('salon');
     if (error) {
       toast.error('Failed to sign in with Google: ' + error.message);
       setIsLoading(false);
-    } else if (data?.user) {
-      // Check user role and redirect
-      const roleData = await getUserRole(data.user.id);
-      if (roleData) {
-        toast.success(`Welcome back! Redirecting to dashboard...`);
-        onClose();
-        setTimeout(() => {
-          navigate(`/salon-dashboard?salon=${roleData.salonId}&role=${roleData.role}`);
-        }, 500);
-      } else {
-        toast.error('No salon associated with this account. Please contact your salon owner.');
-        setIsLoading(false);
-      }
     }
+    // После успешного вызова произойдёт редирект на Google,
+    // затем вернёмся на /redirect?type=salon где RoleBasedRedirect обработает роль
   };
 
   const handleFacebookAuth = async () => {
     setIsLoading(true);
-    const { data, error } = await signInWithFacebook();
+    const { error } = await signInWithFacebook('salon');
     if (error) {
       toast.error('Failed to sign in with Facebook: ' + error.message);
       setIsLoading(false);
-    } else if (data?.user) {
-      // Check user role and redirect
-      const roleData = await getUserRole(data.user.id);
-      if (roleData) {
-        toast.success(`Welcome back! Redirecting to dashboard...`);
-        onClose();
-        setTimeout(() => {
-          navigate(`/salon-dashboard?salon=${roleData.salonId}&role=${roleData.role}`);
-        }, 500);
-      } else {
-        toast.error('No salon associated with this account. Please contact your salon owner.');
-        setIsLoading(false);
-      }
     }
+    // Аналогично — редирект обработает RoleBasedRedirect
   };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    const { data, error } = await signInWithEmail(email, password);
+    const { error } = await signInWithEmail(email, password);
     
     if (error) {
       toast.error('Failed to sign in: ' + error.message);
       setIsLoading(false);
-    } else if (data?.user) {
-      // Check user role and redirect
-      const roleData = await getUserRole(data.user.id);
-      if (roleData) {
-        toast.success(`Welcome back! Redirecting to dashboard...`);
-        onClose();
-        setTimeout(() => {
-          navigate(`/salon-dashboard?salon=${roleData.salonId}&role=${roleData.role}`);
-        }, 500);
-      } else {
-        toast.error('No salon associated with this account. Please contact your salon owner.');
-        setIsLoading(false);
-      }
+    } else {
+      // Сохраняем тип регистрации и переходим на redirect
+      localStorage.setItem('auth_registration_type', 'salon');
+      onClose();
+      navigate('/redirect');
     }
   };
 
