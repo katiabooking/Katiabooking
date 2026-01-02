@@ -1,32 +1,110 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import { toast } from 'sonner';
+
+/**
+ * Получает и очищает тип регистрации из localStorage
+ */
+const getAndClearRegistrationType = (): 'client' | 'salon' => {
+  const type = localStorage.getItem('auth_registration_type') as 'client' | 'salon' | null;
+  localStorage.removeItem('auth_registration_type');
+  return type || 'client';
+};
 
 export function RoleBasedRedirect() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
 
-  useEffect(() => {
-    if (authLoading) return;
+useEffect(() => {
+  console.log('RoleBasedRedirect useEffect:', { user, authLoading });
+  
+  if (authLoading) {
+    console.log('Still loading auth...');
+    return;
+  }
 
-    if (!user) {
-      navigate('/auth');
-      return;
+  if (!user) {
+    console.log('No user, redirecting to /auth');
+    navigate('/auth');
+    return;
+  }
+
+  checkUserRoleAndRedirect();
+}, [user, authLoading]);
+
+  /**
+   * Проверяет, является ли пользователь супер-админом
+   * Ищет по user_id или email в таблице super_admins
+   */
+  const checkIsSuperAdmin = async (userId: string, email: string): Promise<boolean> => {
+    try {
+      // Сначала пробуем найти по email (более надёжно)
+      const { data, error } = await supabase
+        .from('super_admins')
+        .select('id, user_id')
+        .ilike('email', email.toLowerCase())
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking super admin:', error);
+        return false;
+      }
+
+      if (data) {
+        // Если нашли по email, но user_id пустой — обновляем
+        if (!data.user_id) {
+          await supabase
+            .from('super_admins')
+            .update({ user_id: userId })
+            .eq('id', data.id);
+        }
+        return true;
+      }
+
+      // Если не нашли по email, пробуем по user_id
+      const { data: dataByUserId, error: errorByUserId } = await supabase
+        .from('super_admins')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (errorByUserId) {
+        console.error('Error checking super admin by user_id:', errorByUserId);
+        return false;
+      }
+
+      return !!dataByUserId;
+    } catch (error) {
+      console.error('Error checking super admin:', error);
+      return false;
     }
-
-    checkUserRoleAndRedirect();
-  }, [user, authLoading, navigate]);
+  };
 
   const checkUserRoleAndRedirect = async () => {
     if (!user) return;
 
     try {
       setChecking(true);
+      
+      console.log('=== RoleBasedRedirect Debug ===');
+      console.log('User ID:', user.id);
+      console.log('User Email:', user.email);
 
-      // Check if user has a salon role (owner, admin, master)
+      // 1. Проверяем супер-админа в БД
+      const isSuperAdmin = await checkIsSuperAdmin(user.id, user.email || '');
+      console.log('Is Super Admin:', isSuperAdmin);
+      
+      if (isSuperAdmin) {
+        toast.success('Welcome back, Super Admin!');
+        navigate('/superadmin');
+        return;
+      }
+
+      // 2. Проверяем роль в салоне (owner, admin, master)
       const roleResponse = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-3e5c72fb/salon-role/${user.id}`,
         {
@@ -37,35 +115,55 @@ export function RoleBasedRedirect() {
       );
 
       const roleData = await roleResponse.json();
+      console.log('Salon Role Data:', roleData);
 
       if (roleData.role) {
-        // User has a salon role - redirect to appropriate dashboard
+        // Пользователь имеет роль в салоне
         const role = roleData.role.role;
         
         switch (role) {
           case 'owner':
+            toast.success('Welcome back! Redirecting to salon dashboard...');
             navigate('/owner');
             break;
           case 'admin':
+            toast.success('Welcome back! Redirecting to admin dashboard...');
             navigate('/admin');
             break;
           case 'master':
+            toast.success('Welcome back! Redirecting to master dashboard...');
             navigate('/master');
             break;
           default:
-            // Unknown role - show selector
-            navigate('/dashboard-selector');
+            navigate('/client');
         }
       } else {
-        // No salon role - check if they're a regular client
-        // For now, redirect to client dashboard or homepage
-        navigate('/client');
+        // 3. Нет роли — проверяем тип регистрации из localStorage
+        const registrationType = getAndClearRegistrationType();
+        console.log('Registration Type from localStorage:', registrationType);
+        
+        if (registrationType === 'salon') {
+          // Новый салон → страница регистрации
+          toast.info('Please complete your salon registration');
+          navigate('/register');
+        } else {
+          // Клиент → клиентский дашборд
+          toast.success('Welcome to Katia!');
+          navigate('/client');
+        }
       }
     } catch (error) {
       console.error('Error checking user role:', error);
       toast.error('Failed to load your dashboard');
-      // Fallback to dashboard selector
-      navigate('/dashboard-selector');
+      
+      // Fallback по типу из localStorage
+      const registrationType = getAndClearRegistrationType();
+      
+      if (registrationType === 'salon') {
+        navigate('/register');
+      } else {
+        navigate('/client');
+      }
     } finally {
       setChecking(false);
     }
@@ -73,10 +171,11 @@ export function RoleBasedRedirect() {
 
   if (authLoading || checking) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your dashboard...</p>
+          <p className="text-gray-600 text-lg">Loading your dashboard...</p>
+          <p className="text-gray-400 text-sm mt-2">Please wait while we set up your account</p>
         </div>
       </div>
     );
