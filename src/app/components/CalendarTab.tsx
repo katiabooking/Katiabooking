@@ -5,7 +5,6 @@ import { ChevronLeft, ChevronRight, Plus, CreditCard, Maximize2, Minimize2 } fro
 import { Button } from './ui/button';
 import { CheckoutModal } from './CheckoutModal';
 import { BookAppointmentModal } from './BookAppointmentModal';
-import { ServiceDetailsModal } from './ServiceDetailsModal';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';

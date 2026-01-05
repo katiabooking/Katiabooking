@@ -20,9 +20,8 @@ import { NotificationsProvider } from '../contexts/NotificationsContext';
 // Pages
 import { HomePage } from './pages/HomePage';
 import { PricingPage } from './pages/PricingPage';
-import { SalonRegisterPage } from './pages/SalonRegisterPage';
 import { BecomePartnerPage } from './pages/BecomePartnerPage';
-import { AuthPage } from './pages/AuthPage';
+import { AuthPage } from "./pages/AuthPage";
 import { ContactPage } from './pages/ContactPage';
 import { SalonListingPage } from './pages/SalonListingPage';
 import { DashboardSelector } from './pages/DashboardSelector';
@@ -104,7 +103,7 @@ export default function App() {
                     <Routes>
                       <Route path="/" element={<HomePage />} />
                       <Route path="/pricing" element={<PricingPage />} />
-                      <Route path="/register" element={<SalonRegisterPage />} />
+                      <Route path="/register" element={<Navigate to="/auth" />} />
                       <Route path="/partner" element={<BecomePartnerPage />} />
                       <Route path="/auth" element={<AuthPage />} />
                       <Route path="/contact" element={<ContactPage />} />
