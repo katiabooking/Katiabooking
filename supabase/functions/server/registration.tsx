@@ -1,4 +1,7 @@
+// @deno-types="npm:@types/node"
+// @ts-ignore - Deno npm: specifier
 import { Hono } from "npm:hono";
+// @ts-ignore - Deno npm: specifier
 import { createClient } from "npm:@supabase/supabase-js@2";
 import * as kv from './kv_store.tsx';
 
@@ -6,8 +9,11 @@ const app = new Hono();
 
 // Create Supabase client with service role key for admin operations
 const getSupabaseAdmin = () => {
+  // @ts-ignore - Deno global
   return createClient(
+    // @ts-ignore - Deno global
     Deno.env.get('SUPABASE_URL') ?? '',
+    // @ts-ignore - Deno global
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
   );
 };
@@ -16,7 +22,7 @@ const getSupabaseAdmin = () => {
  * POST /make-server-3e5c72fb/register/client
  * Register a new client user
  */
-app.post('/make-server-3e5c72fb/register/client', async (c) => {
+app.post('/register/client', async (c) => {
   try {
     const body = await c.req.json();
     const { full_name, email, phone, password } = body;
@@ -111,7 +117,7 @@ app.post('/make-server-3e5c72fb/register/client', async (c) => {
  * POST /make-server-3e5c72fb/register/owner
  * Register a new salon owner
  */
-app.post('/make-server-3e5c72fb/register/owner', async (c) => {
+app.post('/register/owner', async (c) => {
   try {
     const body = await c.req.json();
     const { full_name, email, phone, password, salon_name } = body;
@@ -206,10 +212,222 @@ app.post('/make-server-3e5c72fb/register/owner', async (c) => {
 });
 
 /**
+ * POST /make-server-3e5c72fb/check-verified-and-confirm-email
+ * Check is_verified status and confirm email if user is verified
+ */
+app.post('/check-verified-and-confirm-email', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { email } = body;
+
+    if (!email) {
+      return c.json(
+        { 
+          success: false, 
+          error: 'Email is required' 
+        },
+        400
+      );
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+
+    // Find user by email
+    const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (listError) {
+      console.error('Error listing users:', listError);
+      return c.json(
+        { 
+          success: false, 
+          error: `Failed to find user: ${listError.message}` 
+        },
+        400
+      );
+    }
+
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+      return c.json(
+        { 
+          success: false, 
+          error: 'User not found' 
+        },
+        404
+      );
+    }
+
+    console.log(`🔍 Checking verification for user: ${email} (ID: ${user.id})`);
+    
+    // Check is_verified in customer.customers table
+    // Try both by ID and by email to ensure we find the record
+    try {
+      // First try by ID (preferred method)
+      let customerData: { is_verified: boolean; id: string; email: string } | null = null;
+      let customerError = null;
+      
+      const { data: dataById, error: errorById } = await supabaseAdmin
+        .schema('customer')
+        .from('customers')
+        .select('is_verified, id, email')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      console.log('📊 Database query by ID result:', { dataById, errorById });
+
+      if (errorById || !dataById) {
+        // If not found by ID, try by email
+        console.log('🔄 User not found by ID, trying by email...');
+        const { data: dataByEmail, error: errorByEmail } = await supabaseAdmin
+          .schema('customer')
+          .from('customers')
+          .select('is_verified, id, email')
+          .eq('email', email.toLowerCase())
+          .maybeSingle();
+
+        console.log('📊 Database query by email result:', { dataByEmail, errorByEmail });
+        
+        if (dataByEmail) {
+          customerData = dataByEmail;
+          customerError = null;
+        } else {
+          customerData = null;
+          customerError = errorByEmail || errorById;
+        }
+      } else {
+        customerData = dataById;
+        customerError = null;
+      }
+
+      console.log('📊 Final customer data:', { customerData, customerError });
+
+      if (customerError) {
+        console.error('❌ Error checking customer data from DB:', customerError);
+        console.log('🔄 Falling back to KV store...');
+        
+        // If table doesn't exist or error, check KV store as fallback
+        const customerFromKV = await kv.get(`customer:${user.id}`);
+        console.log('📦 KV store data:', customerFromKV);
+        
+        if (customerFromKV && customerFromKV.is_verified === true) {
+          console.log('✅ User is verified in KV store');
+          // User is verified in KV store
+          if (!user.email_confirmed_at) {
+            // Confirm email in Auth
+            const { data: updatedUser, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+              user.id,
+              {
+                email_confirm: true
+              }
+            );
+
+            if (updateError) {
+              console.error('Error confirming email:', updateError);
+              return c.json(
+                { 
+                  success: false, 
+                  error: `Failed to confirm email: ${updateError.message}` 
+                },
+                400
+              );
+            }
+
+            console.log(`✅ Email confirmed for verified user (from KV): ${email}`);
+            return c.json({
+              success: true,
+              message: 'User is verified, email confirmed',
+              user_id: user.id,
+              should_confirm_email: false
+            });
+          } else {
+            return c.json({
+              success: true,
+              message: 'User is verified and email already confirmed',
+              user_id: user.id,
+              should_confirm_email: false
+            });
+          }
+        } else {
+          console.log('❌ User not found in KV store or is_verified is false');
+        }
+      } else if (customerData) {
+        console.log('📊 Found customer data in DB:', customerData);
+        
+        if (customerData.is_verified === true) {
+          console.log('✅ User is verified in database');
+          
+          // User is verified in database
+          if (!user.email_confirmed_at) {
+            console.log('📧 Confirming email in Auth...');
+            
+            // Confirm email in Auth
+            const { data: updatedUser, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
+              user.id,
+              {
+                email_confirm: true
+              }
+            );
+
+            if (updateError) {
+              console.error('❌ Error confirming email:', updateError);
+              return c.json(
+                { 
+                  success: false, 
+                  error: `Failed to confirm email: ${updateError.message}` 
+                },
+                400
+              );
+            }
+
+            console.log(`✅ Email confirmed for verified user: ${email}`);
+          } else {
+            console.log('✅ Email already confirmed in Auth');
+          }
+
+          return c.json({
+            success: true,
+            message: 'User is verified',
+            user_id: user.id,
+            email_confirmed: !!user.email_confirmed_at,
+            should_confirm_email: false
+          });
+        } else {
+          console.log('❌ User is_verified is false in database');
+        }
+      } else {
+        console.log('❌ No customer data found in database');
+      }
+    } catch (dbError) {
+      console.error('❌ Error checking verification status:', dbError);
+    }
+
+    // User is not verified
+    console.log('❌ User is not verified, requiring email confirmation');
+    return c.json({
+      success: false,
+      error: 'Email not confirmed. Please check your email and confirm your account.',
+      should_confirm_email: true
+    }, 403);
+
+  } catch (error) {
+    console.error('❌ Error in check-verified-and-confirm-email endpoint:', error);
+    return c.json(
+      { 
+        success: false, 
+        error: 'Server error during verification check',
+        details: error instanceof Error ? error.message : String(error)
+      },
+      500
+    );
+  }
+});
+
+/**
  * GET /make-server-3e5c72fb/test-db-connection
  * Test KV Store connection
  */
-app.get('/make-server-3e5c72fb/test-db-connection', async (c) => {
+app.get('/test-db-connection', async (c) => {
   try {
     // Test KV Store by trying to read/write a test value
     const testKey = 'test:connection';

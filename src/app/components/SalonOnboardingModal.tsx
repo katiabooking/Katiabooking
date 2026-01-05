@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useRegistration } from '../../hooks/useRegistration';
 import { toast } from 'sonner';
+import { supabase } from '../../lib/supabase';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import {
   Select,
@@ -21,6 +23,7 @@ interface SalonOnboardingModalProps {
   subscription: {
     planName: string;
     price: string;
+    billingPeriod?: 'monthly' | 'semi-annual' | 'annual';
   };
 }
 
@@ -85,12 +88,17 @@ const countries: Country[] = [
 ];
 
 export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnboardingModalProps) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { registerWithEmail, isLoading: isRegistering } = useRegistration();
   
   const [step, setStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const totalSteps = 2;
+  
+  // Сохраняем userId после регистрации
+  const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
+  const [registeredUserEmail, setRegisteredUserEmail] = useState<string | null>(null);
 
   // Step 1: Owner Info
   const [firstName, setFirstName] = useState('');
@@ -129,9 +137,19 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
           phone: fullPhone,
         });
         
-        if (!result.success) {
+        if (!result.success || !result.userId) {
           setIsSaving(false);
           return;
+        }
+
+        // Сохраняем userId и email для использования в Step 2
+        setRegisteredUserId(result.userId);
+        setRegisteredUserEmail(email);
+
+        // Явно получаем текущую сессию для обновления контекста
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log('Session retrieved after registration:', session.user?.email);
         }
 
         toast.success('✅ Account created successfully!');
@@ -151,14 +169,38 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
   };
 
   const handleComplete = async () => {
-    if (!user) {
-      toast.error('User not authenticated');
-      return;
-    }
-
     setIsSaving(true);
 
     try {
+      // Получаем текущего пользователя - используем сохраненный userId или текущего user из контекста
+      let currentUser = user;
+      let currentUserId = registeredUserId;
+      let currentUserEmail = registeredUserEmail || email;
+
+      // Если user из контекста не доступен, но у нас есть registeredUserId, получаем пользователя напрямую
+      if (!currentUser && currentUserId) {
+        const { data: { user: fetchedUser } } = await supabase.auth.getUser();
+        if (fetchedUser) {
+          currentUser = fetchedUser;
+          currentUserId = fetchedUser.id;
+          currentUserEmail = fetchedUser.email || email;
+        }
+      }
+
+      // Если все еще нет пользователя, показываем ошибку
+      if (!currentUser && !currentUserId) {
+        toast.error('User not authenticated. Please try again.');
+        setIsSaving(false);
+        return;
+      }
+
+      const userId = currentUserId || currentUser?.id;
+      if (!userId) {
+        toast.error('User ID not found. Please try again.');
+        setIsSaving(false);
+        return;
+      }
+
       const salonId = `salon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
       const fullPhone = `${selectedCountry.dialCode}${phone}`;
 
@@ -167,10 +209,10 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
         name: salonName,
         address: salonAddress,
         phone: fullPhone,
-        email: user.email,
+        email: currentUserEmail,
         logo: null,
         photos: [],
-        ownerId: user.id,
+        ownerId: userId,
         services: [],
         staff: [],
         subscription: {
@@ -202,7 +244,7 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
       }
 
       const roleData = {
-        userId: user.id,
+        userId: userId,
         roleData: {
           role: 'owner',
           salonId: salonId,
@@ -234,7 +276,7 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
       toast.success('🎉 Salon registration complete! Welcome to Katia Booking!');
       
       setTimeout(() => {
-        window.location.href = '/owner';
+        navigate('/owner');
       }, 1500);
     } catch (error) {
       console.error('Error completing salon setup:', error);

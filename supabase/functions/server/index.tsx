@@ -57,7 +57,7 @@ app.route("/", supportMessageRoutes);
 app.route("/", emailVerificationRoutes);
 
 // Mount registration routes
-app.route("/", registrationRoutes);
+app.route("/make-server-3e5c72fb", registrationRoutes);
 
 // Mount stripe routes
 app.route("/", stripeRoutes);

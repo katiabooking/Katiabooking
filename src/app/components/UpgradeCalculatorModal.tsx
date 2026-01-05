@@ -355,16 +355,15 @@ export function UpgradeCalculatorModal({
         <StripePaymentModal
           isOpen={isPaymentOpen}
           onClose={() => setIsPaymentOpen(false)}
-          planName={`Upgrade to ${newPlan.name}`}
-          price={difference.toFixed(2)}
-          currency="aed"
-          onPaymentSuccess={() => {
+          amount={difference}
+          currency="AED"
+          description={`Upgrade to ${newPlan.name}`}
+          onSuccess={() => {
             setIsPaymentOpen(false);
             onClose();
             // TODO: Refresh subscription data
             console.log('Upgrade successful!');
           }}
-          type="upgrade"
         />
       )}
     </>

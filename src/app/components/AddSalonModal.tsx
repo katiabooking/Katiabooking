@@ -465,17 +465,16 @@ export function AddSalonModal({ onClose, onAdd }: AddSalonModalProps) {
       </div>
 
       {/* Payment Modal */}
-      {showPayment && (
-        <StripePaymentModal
-          amount={calculatePrice(selectedPlan, billingPeriod)}
-          description={`${plans.find(p => p.id === selectedPlan)?.name} Plan - ${salonName}`}
-          onSuccess={handlePaymentSuccess}
-          onClose={() => {
-            setShowPayment(false);
-            setStep('plan');
-          }}
-        />
-      )}
+      <StripePaymentModal
+        isOpen={showPayment}
+        amount={calculatePrice(selectedPlan, billingPeriod)}
+        description={`${plans.find(p => p.id === selectedPlan)?.name} Plan - ${salonName}`}
+        onSuccess={handlePaymentSuccess}
+        onClose={() => {
+          setShowPayment(false);
+          setStep('plan');
+        }}
+      />
     </div>
   );
 }

@@ -654,11 +654,10 @@ export function PricingPage() {
       amount={calculatePrice(selectedPlan.id, billingPeriod)}  // ← число, не строка!
       currency={currency.code}
       description={`${selectedPlan.name} - ${billingPeriod === 'monthly' ? 'Monthly' : billingPeriod === 'semi-annual' ? '6 Months' : 'Annual'}`}
-      onPaymentSuccess={() => {
+      onSuccess={() => {
         setIsPaymentOpen(false);
         setIsOnboardingOpen(true);
       }}
-      type="subscription"
     />
     <SalonOnboardingModal
       isOpen={isOnboardingOpen}
