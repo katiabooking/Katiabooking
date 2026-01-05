@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { useAuth } from '../../contexts/AuthContext';
+import { useRegistration } from '../../hooks/useRegistration';
 import { toast } from 'sonner';
 
 interface SalonAuthModalProps {
@@ -15,48 +15,36 @@ interface SalonAuthModalProps {
 
 export function SalonAuthModal({ isOpen, onClose }: SalonAuthModalProps) {
   const navigate = useNavigate();
-  const { signInWithEmail, signInWithGoogle, signInWithFacebook } = useAuth();
+  const { 
+    isLoading, 
+    signInWithEmail, 
+    registerWithGoogle, 
+    registerWithFacebook 
+  } = useRegistration();
   
   const [mode, setMode] = useState<'choice' | 'signin'>('choice');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
   const handleGoogleAuth = async () => {
-    setIsLoading(true);
-    const { error } = await signInWithGoogle('salon');
-    if (error) {
-      toast.error('Failed to sign in with Google: ' + error.message);
-      setIsLoading(false);
-    }
+    await registerWithGoogle('salon');
     // После успешного вызова произойдёт редирект на Google,
-    // затем вернёмся на /redirect?type=salon где RoleBasedRedirect обработает роль
+    // затем вернёмся на /redirect где RoleBasedRedirect обработает роль
   };
 
   const handleFacebookAuth = async () => {
-    setIsLoading(true);
-    const { error } = await signInWithFacebook('salon');
-    if (error) {
-      toast.error('Failed to sign in with Facebook: ' + error.message);
-      setIsLoading(false);
-    }
+    await registerWithFacebook('salon');
     // Аналогично — редирект обработает RoleBasedRedirect
   };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    const { error } = await signInWithEmail(email, password);
+    const result = await signInWithEmail(email, password, 'salon');
     
-    if (error) {
-      toast.error('Failed to sign in: ' + error.message);
-      setIsLoading(false);
-    } else {
-      // Сохраняем тип регистрации и переходим на redirect
-      localStorage.setItem('auth_registration_type', 'salon');
+    if (result.success) {
       onClose();
       navigate('/redirect');
     }

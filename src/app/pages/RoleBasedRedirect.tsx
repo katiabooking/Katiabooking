@@ -4,45 +4,34 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import { toast } from 'sonner';
-
-/**
- * Получает и очищает тип регистрации из localStorage
- */
-const getAndClearRegistrationType = (): 'client' | 'salon' => {
-  const type = localStorage.getItem('auth_registration_type') as 'client' | 'salon' | null;
-  localStorage.removeItem('auth_registration_type');
-  return type || 'client';
-};
+import { 
+  getAndClearRegistrationType, 
+  getDashboardByEntityType,
+  getRegisterPageByEntityType,
+  EntityType 
+} from '../../hooks/useRegistration';
 
 export function RoleBasedRedirect() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
 
-useEffect(() => {
-  console.log('RoleBasedRedirect useEffect:', { user, authLoading });
-  
-  if (authLoading) {
-    console.log('Still loading auth...');
-    return;
-  }
+  useEffect(() => {
+    if (authLoading) return;
 
-  if (!user) {
-    console.log('No user, redirecting to /auth');
-    navigate('/auth');
-    return;
-  }
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
 
-  checkUserRoleAndRedirect();
-}, [user, authLoading]);
+    checkUserRoleAndRedirect();
+  }, [user, authLoading]);
 
   /**
    * Проверяет, является ли пользователь супер-админом
-   * Ищет по user_id или email в таблице super_admins
    */
   const checkIsSuperAdmin = async (userId: string, email: string): Promise<boolean> => {
     try {
-      // Сначала пробуем найти по email (более надёжно)
       const { data, error } = await supabase
         .from('super_admins')
         .select('id, user_id')
@@ -145,11 +134,11 @@ useEffect(() => {
         if (registrationType === 'salon') {
           // Новый салон → страница регистрации
           toast.info('Please complete your salon registration');
-          navigate('/register');
+          navigate(getRegisterPageByEntityType('salon'));
         } else {
           // Клиент → клиентский дашборд
           toast.success('Welcome to Katia!');
-          navigate('/client');
+          navigate(getDashboardByEntityType('client'));
         }
       }
     } catch (error) {
@@ -160,9 +149,9 @@ useEffect(() => {
       const registrationType = getAndClearRegistrationType();
       
       if (registrationType === 'salon') {
-        navigate('/register');
+        navigate(getRegisterPageByEntityType('salon'));
       } else {
-        navigate('/client');
+        navigate(getDashboardByEntityType('client'));
       }
     } finally {
       setChecking(false);

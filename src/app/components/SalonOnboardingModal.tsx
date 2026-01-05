@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { X, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { Button } from './ui/button';
-import { useCurrency } from '../../contexts/CurrencyContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRegistration } from '../../hooks/useRegistration';
 import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import {
@@ -85,11 +85,12 @@ const countries: Country[] = [
 ];
 
 export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnboardingModalProps) {
-  const { currency } = useCurrency();
-  const { user, signUpWithEmail } = useAuth();
+  const { user } = useAuth();
+  const { registerWithEmail, isLoading: isRegistering } = useRegistration();
+  
   const [step, setStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
-  const totalSteps = 2; // Simplified to 2 steps
+  const totalSteps = 2;
 
   // Step 1: Owner Info
   const [firstName, setFirstName] = useState('');
@@ -97,7 +98,7 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]); // Default to UAE
+  const [selectedCountry, setSelectedCountry] = useState<Country>(countries[0]);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
 
   // Step 2: Salon Details
@@ -107,7 +108,6 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
   if (!isOpen) return null;
 
   const handlePhoneVerification = () => {
-    // WhatsApp verification simulation
     const fullPhone = `${selectedCountry.dialCode}${phone}`;
     toast.success(`Verification code sent to WhatsApp: ${fullPhone}`);
     setTimeout(() => {
@@ -117,14 +117,19 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
 
   const handleNextStep = async () => {
     if (step === 1) {
-      // Create user account before moving to step 2
       setIsSaving(true);
       try {
         const fullName = `${firstName} ${lastName}`;
-        const { error } = await signUpWithEmail(email, password, fullName);
+        const fullPhone = `${selectedCountry.dialCode}${phone}`;
         
-        if (error) {
-          toast.error(`Registration failed: ${error.message}`);
+        const result = await registerWithEmail('salon', {
+          email,
+          password,
+          fullName,
+          phone: fullPhone,
+        });
+        
+        if (!result.success) {
           setIsSaving(false);
           return;
         }
@@ -132,7 +137,6 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
         toast.success('✅ Account created successfully!');
         setIsSaving(false);
         
-        // Wait a moment for auth state to update
         setTimeout(() => {
           setStep(step + 1);
         }, 500);
@@ -155,13 +159,9 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
     setIsSaving(true);
 
     try {
-      // Generate salon ID
       const salonId = `salon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      
-      // Full phone number with country code
       const fullPhone = `${selectedCountry.dialCode}${phone}`;
 
-      // Prepare salon data
       const salonData = {
         id: salonId,
         name: salonName,
@@ -178,12 +178,11 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
           price: subscription.price,
           startedAt: new Date().toISOString(),
         },
-        isPublished: false, // Not published by default
+        isPublished: false,
         publishedAt: null,
         createdAt: new Date().toISOString(),
       };
 
-      // Save salon data
       const salonResponse = await fetch(
         `https://${projectId}.supabase.co/functions/v1/make-server-3e5c72fb/salon`,
         {
@@ -202,7 +201,6 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
         throw new Error(salonResult.error || 'Failed to save salon data');
       }
 
-      // Save owner role
       const roleData = {
         userId: user.id,
         roleData: {
@@ -235,9 +233,8 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
 
       toast.success('🎉 Salon registration complete! Welcome to Katia Booking!');
       
-      // Redirect to owner dashboard
       setTimeout(() => {
-        window.location.href = '/owner-dashboard';
+        window.location.href = '/owner';
       }, 1500);
     } catch (error) {
       console.error('Error completing salon setup:', error);
@@ -466,10 +463,10 @@ export function SalonOnboardingModal({ isOpen, onClose, subscription }: SalonOnb
           {step < totalSteps ? (
             <Button
               onClick={handleNextStep}
-              disabled={!canProceed() || isSaving}
+              disabled={!canProceed() || isSaving || isRegistering}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 flex items-center gap-2"
             >
-              {isSaving ? (
+              {isSaving || isRegistering ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Creating Account...
