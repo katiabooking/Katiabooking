@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, User, Mail, Phone, Clock, Shield } from 'lucide-react';
 import { Button } from './ui/button';
 import type { Master, WorkingHours } from '../../contexts/MastersContext';
+import React from 'react';
 
 interface AddAdminModalProps {
   isOpen: boolean;

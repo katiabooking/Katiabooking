@@ -7,6 +7,7 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { useNavigate } from 'react-router-dom';
 import { hasAvailableSlots, getAvailabilitySummary, formatTimeSlot } from '../utils/availabilityUtils';
 import { City } from '../data/locations';
+import React from 'react';
 
 interface Message {
   id: string;

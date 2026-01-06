@@ -10,6 +10,7 @@ import {
   calculateDeposit 
 } from '../types/depositSystem';
 import { StripePaymentModal } from './StripePaymentModal';
+import React from 'react';
 
 interface BookingPaymentOptionsProps {
   salonId: string;

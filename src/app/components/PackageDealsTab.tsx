@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface Service {
   id: string;

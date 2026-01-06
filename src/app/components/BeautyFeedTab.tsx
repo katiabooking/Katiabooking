@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { ServicePostModal, type NewServicePost } from './ServicePostModal';
+import React from 'react';
 
 interface FeedPost {
   id: string;

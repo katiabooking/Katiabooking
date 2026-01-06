@@ -3,6 +3,7 @@ import { X, Download, Smartphone } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { promptInstall, canInstall, getPlatform, isStandalone } from '../../utils/pwaUtils';
+import React from 'react';
 
 export function PWAInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);

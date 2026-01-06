@@ -10,6 +10,7 @@ import {
   getBookingStatusDisplay,
   formatTimeRemaining,
 } from '../types/bookingWorkflow';
+import React from 'react';
 
 interface ClientBookingTrackerProps {
   bookings: ClientBookingView[];

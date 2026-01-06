@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar as CalendarIcon, User, Phone, Scissors, Clock, Plus, MessageCircle, Gift, Repeat, Package as PackageIcon } from 'lucide-react';
 import { Button } from './ui/button';
+import React from 'react';
 
 interface Service {
   id: string;
@@ -94,7 +95,7 @@ export function BookAppointmentModal({
     for (let hour = 9; hour <= 19; hour++) {
       for (let minute = 0; minute < 60; minute += 15) {
         const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-        slots.push(time);
+        slots.push(time as never);
       }
     }
     return slots;

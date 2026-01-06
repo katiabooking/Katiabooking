@@ -1,14 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Store, ChevronDown, Check, Plus, Settings } from 'lucide-react';
 import { Button } from './ui/button';
-
-interface Salon {
-  id: string;
-  name: string;
-  location: string;
-  plan: 'starter' | 'professional' | 'business';
-  image?: string;
-}
+import type { Salon } from '../../types/roles';
 
 interface SalonSwitcherProps {
   salons: Salon[];
@@ -17,6 +10,8 @@ interface SalonSwitcherProps {
   onAddNew?: () => void;
   onManage?: () => void;
 }
+
+type PlanType = 'starter' | 'professional' | 'business';
 
 export function SalonSwitcher({ 
   salons, 
@@ -41,7 +36,7 @@ export function SalonSwitcher({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const getPlanBadgeColor = (plan: string) => {
+  const getPlanBadgeColor = (plan?: PlanType) => {
     switch (plan) {
       case 'business':
         return 'bg-gradient-to-r from-purple-600 to-pink-600';
@@ -54,6 +49,12 @@ export function SalonSwitcher({
     }
   };
 
+  const getSalonPlan = (salon: Salon): PlanType => {
+    // Default to 'professional' if plan is not available
+    // You can add logic here to determine plan based on salon properties
+    return 'professional';
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Trigger Button */}
@@ -62,14 +63,14 @@ export function SalonSwitcher({
         className="flex items-center gap-3 px-4 py-2 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-all shadow-sm min-w-[200px]"
       >
         <div className="flex items-center gap-3 flex-1">
-          {currentSalon?.image ? (
+          {currentSalon?.logo ? (
             <img
-              src={currentSalon.image}
+              src={currentSalon.logo}
               alt={currentSalon.name}
               className="w-8 h-8 rounded-lg object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+            <div className={`w-8 h-8 rounded-lg ${getPlanBadgeColor(currentSalon ? getSalonPlan(currentSalon) : undefined)} flex items-center justify-center`}>
               <Store className="w-4 h-4 text-white" />
             </div>
           )}
@@ -80,7 +81,7 @@ export function SalonSwitcher({
             </div>
             {currentSalon && (
               <div className="text-xs text-gray-500 truncate max-w-[150px]">
-                {currentSalon.location}
+                {currentSalon.address}
               </div>
             )}
           </div>
@@ -129,14 +130,14 @@ export function SalonSwitcher({
                   salon.id === currentSalonId ? 'bg-purple-50' : ''
                 }`}
               >
-                {salon.image ? (
+                {salon.logo ? (
                   <img
-                    src={salon.image}
+                    src={salon.logo}
                     alt={salon.name}
                     className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                   />
                 ) : (
-                  <div className={`w-10 h-10 rounded-lg ${getPlanBadgeColor(salon.plan)} flex items-center justify-center flex-shrink-0`}>
+                  <div className={`w-10 h-10 rounded-lg ${getPlanBadgeColor(getSalonPlan(salon))} flex items-center justify-center flex-shrink-0`}>
                     <Store className="w-5 h-5 text-white" />
                   </div>
                 )}
@@ -150,10 +151,10 @@ export function SalonSwitcher({
                       <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
                     )}
                   </div>
-                  <div className="text-xs text-gray-600 truncate">{salon.location}</div>
+                  <div className="text-xs text-gray-600 truncate">{salon.address}</div>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-xs px-2 py-0.5 rounded-full text-white ${getPlanBadgeColor(salon.plan)}`}>
-                      {salon.plan.charAt(0).toUpperCase() + salon.plan.slice(1)}
+                    <span className={`text-xs px-2 py-0.5 rounded-full text-white ${getPlanBadgeColor(getSalonPlan(salon))}`}>
+                      {getSalonPlan(salon).charAt(0).toUpperCase() + getSalonPlan(salon).slice(1)}
                     </span>
                   </div>
                 </div>

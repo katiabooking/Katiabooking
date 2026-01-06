@@ -3,6 +3,7 @@ import { TrendingUp, Calendar, Users, DollarSign, AlertTriangle, CheckCircle, Br
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import React from 'react';
 
 interface ForecastData {
   period: string;

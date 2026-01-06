@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Save, X, AlertCircle, Wrench, Users, CheckCircle }
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { toast } from 'sonner';
+import React from 'react';
 
 export interface Resource {
   id: string;

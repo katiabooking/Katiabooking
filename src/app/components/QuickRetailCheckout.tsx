@@ -5,6 +5,7 @@ import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface Product {
   id: string;

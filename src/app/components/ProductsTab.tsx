@@ -6,6 +6,7 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { AddProductModal, type NewProduct } from './AddProductModal';
 import { RestockModal } from './RestockModal';
 import { EditProductModal, type EditableProduct } from './EditProductModal';
+import React from 'react';
 
 interface Product {
   id: string;

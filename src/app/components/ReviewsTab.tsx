@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Star, MessageSquare, ThumbsUp, TrendingUp, Filter, Search } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
+import React from 'react';
 
 interface Review {
   id: string;

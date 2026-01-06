@@ -2,6 +2,25 @@ import { FavoritesAnalytics } from './FavoritesAnalytics';
 import { FeedAnalytics } from './FeedAnalytics';
 import type { User, UserRole, Salon, Booking, Client } from '../../types/roles';
 import { PERMISSIONS, hasPermission } from '../../types/roles';
+import { useState } from 'react';
+import { BarChart3, Store, Calendar, Users, Target, Scissors, Package, TrendingUp, Gift, Brain, Zap, Settings, Download, Bell, Clock, Image as ImageIcon, MessageSquare, Sparkles, Camera, Star, UserPlus, DollarSign, LogOut, RefreshCw } from 'lucide-react';
+import { Card, CardContent, CardHeader } from './ui/card';
+import { SalonSwitcher } from './SalonSwitcher';
+import React from 'react';
+import { Button } from './ui/button';
+import { DataExportImport } from './DataExportImport';
+import { SalonSettingsTab } from './SalonSettingsTab';
+import { PackageDealsTab } from './PackageDealsTab';
+import { DynamicPricingTab } from './DynamicPricingTab';
+import { ReferralProgramTab } from './ReferralProgramTab';
+import { AISmartFillingTab } from './AISmartFillingTab';
+import { AdvancedForecastingTab } from './AdvancedForecastingTab';
+import { BookingSettingsTab } from './BookingSettingsTab';
+import { GiftCardsTab } from './GiftCardsTab';
+import { MultiSalonManager } from './MultiSalonManager';
+import { InviteStaffModal } from './InviteStaffModal';
+
+
 
 interface SalonDashboardProps {
   currentUser: User;

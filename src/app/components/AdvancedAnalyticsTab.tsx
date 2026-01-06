@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Users, Calendar, Target, AlertCircle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import React from 'react';
 
 export function AdvancedAnalyticsTab() {
   const { formatPrice } = useCurrency();

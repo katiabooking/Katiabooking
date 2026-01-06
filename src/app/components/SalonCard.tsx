@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
 import { ShareModal } from './ShareModal';
+import React from 'react';
 
 interface SalonCardProps {
   salon: Salon;

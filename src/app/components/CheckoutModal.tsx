@@ -3,6 +3,7 @@ import { X, Plus, CreditCard, DollarSign, Link2, Search, Scissors, ShoppingBag }
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import React from 'react';
 
 interface CheckoutItem {
   id: string;

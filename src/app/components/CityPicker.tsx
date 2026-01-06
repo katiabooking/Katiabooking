@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Globe, ChevronDown, Check } from 'lucide-react';
 import { CITIES, City } from '../data/locations';
+import React from 'react';
 
 interface CityPickerProps {
   value: City;

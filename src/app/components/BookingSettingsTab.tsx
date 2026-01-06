@@ -3,6 +3,7 @@ import { Save, Settings, Users, Gift, Repeat, Percent } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import React from 'react';
 
 export interface BookingSettings {
   groupDiscounts: {

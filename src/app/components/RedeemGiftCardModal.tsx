@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface GiftCardInfo {
   code: string;

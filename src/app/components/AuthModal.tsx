@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { useState } from 'react';
+import React from 'react';
 
 interface AuthModalProps {
   isOpen: boolean;

@@ -3,6 +3,7 @@ import { X, Plus, Trash2, Calendar, Clock, User, Mail, Phone, Briefcase, Calenda
 import { Button } from './ui/button';
 import { useServices } from '../../contexts/ServicesContext';
 import type { Master, WorkingHours, Vacation, ExtraWorkDay } from '../../contexts/MastersContext';
+import React from 'react';
 
 interface AddMasterModalProps {
   isOpen: boolean;

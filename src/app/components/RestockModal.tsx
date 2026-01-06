@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface RestockModalProps {
   isOpen: boolean;

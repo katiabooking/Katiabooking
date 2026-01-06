@@ -10,6 +10,7 @@ import {
   getTimeUntilAutoDecline,
   isBookingUrgent,
 } from '../types/bookingWorkflow';
+import React from 'react';
 
 interface Master {
   id: string;

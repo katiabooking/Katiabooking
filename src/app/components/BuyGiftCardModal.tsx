@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { StripePaymentModal } from './StripePaymentModal';
 import { GiftCardPreview } from './GiftCardPreview';
 import { GiftCardTheme, GIFT_CARD_THEMES, SalonGiftCardBranding } from '../types/giftCardTemplates';
+import React from 'react';
 
 interface BuyGiftCardModalProps {
   salonId: string;

@@ -9,6 +9,7 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import React from 'react';
 
 interface Booking {
   id: string;
@@ -118,7 +119,7 @@ function BookingCard({
   if (view === 'month') {
     return (
       <div
-        ref={drag}
+        ref={drag as any}
         className={`${categoryColors.bg} ${categoryColors.border} border-l-4 rounded p-1 mb-0.5 cursor-move text-[10px] ${
           isDragging ? 'opacity-50' : 'opacity-100'
         }`}
@@ -130,7 +131,7 @@ function BookingCard({
 
   return (
     <div
-      ref={drag}
+      ref={drag as any}
       className={`${categoryColors.bg} ${categoryColors.border} border-l-4 rounded-lg p-2 mb-1 cursor-move hover:shadow-md transition-shadow group relative ${
         isDragging ? 'opacity-50' : 'opacity-100'
       }`}
@@ -203,7 +204,7 @@ function TimeSlot({
 
   return (
     <div
-      ref={drop}
+      ref={drop as any}
       className={`border-r border-gray-200 transition-colors ${
         isOver ? 'bg-purple-50' : 'hover:bg-gray-50'
       }`}
@@ -239,8 +240,8 @@ export function CalendarTab({ onNewBooking }: CalendarTabProps) {
     return () => clearInterval(timer);
   }, []);
 
-  const generate15MinuteSlots = () => {
-    const slots = [];
+  const generate15MinuteSlots = (): string[] => {
+    const slots: string[] = [];
     for (let hour = 9; hour <= 19; hour++) {
       for (let minute = 0; minute < 60; minute += 15) {
         const time = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
@@ -439,8 +440,8 @@ export function CalendarTab({ onNewBooking }: CalendarTabProps) {
     setCurrentDate(newDate);
   };
 
-  const getWeekDays = () => {
-    const days = [];
+  const getWeekDays = (): Date[] => {
+    const days: Date[] = [];
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
     
@@ -452,13 +453,13 @@ export function CalendarTab({ onNewBooking }: CalendarTabProps) {
     return days;
   };
 
-  const getMonthDays = () => {
+  const getMonthDays = (): Array<{ date: Date; isCurrentMonth: boolean }> => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const startDay = firstDay.getDay();
-    const days = [];
+    const days: Array<{ date: Date; isCurrentMonth: boolean }> = [];
 
     for (let i = 0; i < startDay; i++) {
       const prevDate = new Date(year, month, -startDay + i + 1);

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Filter, MessageCircle, Heart, Calendar as CalendarIcon, CalendarDays } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import React from 'react';
 
 export function AnalyticsTab() {
   const [timeFilter, setTimeFilter] = useState('This Month');

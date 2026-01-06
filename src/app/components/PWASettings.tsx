@@ -15,6 +15,7 @@ import {
   getPlatform,
   promptInstall
 } from '../../utils/pwaUtils';
+import React from 'react';
 
 export function PWASettings() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);

@@ -6,6 +6,7 @@ import { Switch } from './ui/switch';
 import { Label } from './ui/label';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface SalonNotificationConfig {
   enabled: boolean;
@@ -50,7 +51,8 @@ export function SalonNotificationSettings() {
 
   const loadConfig = () => {
     try {
-      const savedConfig = localStorage.getItem(`salon:notifications:${user?.salonId || 'default'}`);
+      const salonId = user?.user_metadata?.salonId || user?.id || 'default';
+      const savedConfig = localStorage.getItem(`salon:notifications:${salonId}`);
       if (savedConfig) {
         setConfig(JSON.parse(savedConfig));
       }
@@ -79,7 +81,8 @@ export function SalonNotificationSettings() {
     setIsSaving(true);
     try {
       // Save to localStorage (in production, this would be an API call)
-      localStorage.setItem(`salon:notifications:${user?.salonId || 'default'}`, JSON.stringify(config));
+      const salonId = user?.user_metadata?.salonId || user?.id || 'default';
+      localStorage.setItem(`salon:notifications:${salonId}`, JSON.stringify(config));
       
       toast.success('Notification settings saved successfully! 🎉');
       setHasChanges(false);

@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface ReferralStats {
   totalReferrals: number;

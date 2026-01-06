@@ -13,7 +13,8 @@ import { FeedPostCard } from './FeedPostCard';
 import { CreateFeedPost } from './CreateFeedPost';
 import { toast } from 'sonner';
 import { projectId, publicAnonKey } from '../../../utils/supabase/info';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
+import React from 'react';
 
 interface FeedPost {
   id: string;

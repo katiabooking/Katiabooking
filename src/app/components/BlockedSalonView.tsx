@@ -17,6 +17,7 @@ import {
   ArrowRight,
   HelpCircle,
 } from 'lucide-react';
+import React from 'react';
 
 interface BlockedSalonViewProps {
   salon: {

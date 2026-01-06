@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Clock, Users, Calendar as CalendarIcon, TrendingUp, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
+import React from 'react';
 
 interface AttendanceRecord {
   id: string;

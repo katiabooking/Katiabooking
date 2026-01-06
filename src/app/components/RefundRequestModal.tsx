@@ -17,6 +17,7 @@ import {
   Calendar,
   ArrowLeft,
 } from 'lucide-react';
+import React from 'react';
 
 interface RefundRequestModalProps {
   salon: any;

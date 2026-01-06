@@ -3,6 +3,7 @@ import { X, Maximize2, Minimize2, Navigation as NavigationIcon, Clock, MapPin } 
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import L from 'leaflet';
+import React from 'react';
 
 interface SalonMapModalProps {
   salon: any;

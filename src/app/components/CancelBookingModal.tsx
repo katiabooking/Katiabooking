@@ -5,6 +5,7 @@ import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface CancelBookingModalProps {
   isOpen: boolean;

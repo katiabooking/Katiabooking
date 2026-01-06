@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Bot, Send, Info } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
+import React from 'react';
 
 export function AIToolsTab() {
   const [aiEnabled, setAiEnabled] = useState(true);

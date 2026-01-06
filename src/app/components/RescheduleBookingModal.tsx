@@ -6,6 +6,7 @@ import { Badge } from './ui/badge';
 import { Calendar as CalendarComponent } from './ui/calendar';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface RescheduleBookingModalProps {
   isOpen: boolean;

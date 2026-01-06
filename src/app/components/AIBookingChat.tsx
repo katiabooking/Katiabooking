@@ -9,6 +9,7 @@ import { Calendar } from './ui/calendar';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { useBookings } from '../../contexts/BookingsContext';
 import { AuthModal } from './AuthModal';
+import React from 'react';
 
 interface AIBookingChatProps {
   salon: any;

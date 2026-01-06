@@ -3,6 +3,7 @@ import { RefreshCw, Calendar, Clock, User, Sparkles, Check } from 'lucide-react'
 import { Button } from './ui/button';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface PastBooking {
   id: string;

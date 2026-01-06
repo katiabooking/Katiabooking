@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { toast } from 'sonner';
 import { StripePaymentModal } from './StripePaymentModal';
+import React from 'react';
 
 interface AddSalonModalProps {
   onClose: () => void;
@@ -15,7 +16,7 @@ type Plan = 'starter' | 'professional' | 'business';
 type BillingPeriod = 'monthly' | 'semi-annual' | 'annual';
 
 export function AddSalonModal({ onClose, onAdd }: AddSalonModalProps) {
-  const { formatPrice, convertFromAED } = useCurrency();
+  const { formatPrice, convertPrice } = useCurrency();
   const [step, setStep] = useState<'details' | 'plan' | 'payment'>('details');
   
   // Salon details

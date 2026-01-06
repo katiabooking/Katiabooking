@@ -7,6 +7,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useRegistration } from '../../hooks/useRegistration';
 import { toast } from 'sonner';
+import React from 'react';
 
 interface SalonAuthModalProps {
   isOpen: boolean;

@@ -13,6 +13,7 @@ import {
   formatTimeRemaining,
   isBookingUrgent,
 } from '../types/bookingWorkflow';
+import React from 'react';
 
 interface SalonBookingConfirmationPanelProps {
   bookings: SalonBookingView[];
