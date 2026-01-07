@@ -1,7 +1,30 @@
+import { useState } from 'react';
+import { InviteStaffModal } from './InviteStaffModal';
+import { AdvancedForecastingTab } from './AdvancedForecastingTab';
+import { BookingSettingsTab } from './BookingSettingsTab';
+import { GiftCardsTab } from './GiftCardsTab';
+import { MultiSalonManager } from './MultiSalonManager';
 import { FavoritesAnalytics } from './FavoritesAnalytics';
 import { FeedAnalytics } from './FeedAnalytics';
 import type { User, UserRole, Salon, Booking, Client } from '../../types/roles';
 import { PERMISSIONS, hasPermission } from '../../types/roles';
+import { Card, CardContent } from '../../../Katiabooking-main/src/app/components/ui/card';
+import { CardHeader } from './ui/card';
+import { 
+  BarChart3, Store, Calendar, Users, Target, Scissors, Package, TrendingUp, 
+  Gift, Brain, Zap, Settings, Camera, Star, UserPlus, DollarSign, Bell, 
+  Clock, Image as ImageIcon, MessageSquare, Sparkles, Download, LogOut,
+  Building2, RefreshCw
+} from 'lucide-react';
+import { SalonSwitcher } from './SalonSwitcher';
+import { Button } from '../../../Katiabooking-main/src/app/components/ui/button';
+import { DataExportImport } from './DataExportImport';
+import { SalonSettingsTab } from './SalonSettingsTab';
+import { PackageDealsTab } from './PackageDealsTab';
+import { DynamicPricingTab } from './DynamicPricingTab';
+import { ReferralProgramTab } from './ReferralProgramTab';
+import { AISmartFillingTab } from './AISmartFillingTab';
+
 
 interface SalonDashboardProps {
   currentUser: User;

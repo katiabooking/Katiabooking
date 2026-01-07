@@ -651,22 +651,20 @@ export function PricingPage() {
           <StripePaymentModal 
       isOpen={isPaymentOpen} 
       onClose={() => setIsPaymentOpen(false)}
-      amount={calculatePrice(selectedPlan.id, billingPeriod)}  // ← число, не строка!
+      amount={calculatePrice(selectedPlan.id, billingPeriod)}
       currency={currency.code}
       description={`${selectedPlan.name} - ${billingPeriod === 'monthly' ? 'Monthly' : billingPeriod === 'semi-annual' ? '6 Months' : 'Annual'}`}
       onPaymentSuccess={() => {
         setIsPaymentOpen(false);
         setIsOnboardingOpen(true);
       }}
-      type="subscription"
     />
     <SalonOnboardingModal
       isOpen={isOnboardingOpen}
       onClose={() => setIsOnboardingOpen(false)}
       subscription={{
         planName: selectedPlan.name,
-        price: calculatePrice(selectedPlan.id, billingPeriod).toString(),
-        billingPeriod: billingPeriod
+        price: calculatePrice(selectedPlan.id, billingPeriod).toString()
       }}
           />
         </>

@@ -490,7 +490,7 @@ app.post(`${BASE_PATH}/bookings/:bookingId/reschedule-response`, async (c) => {
 /**
  * Get salon's pending bookings
  */
-app.get(`${BASE_PATH}/salons/:salonId/bookings/pending`, async (c) => {
+app.get(`${BASE_PATH}/salons/:salonId/bookings/pending`, async (c: { req: { param: (arg0: string) => any; }; json: (arg0: { success?: boolean; bookings?: BookingWithWorkflow[]; count?: number; error?: string; }, arg1: number | undefined) => any; }) => {
   try {
     const salonId = c.req.param('salonId');
     
