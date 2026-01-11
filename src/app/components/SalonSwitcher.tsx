@@ -1,14 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Store, ChevronDown, Check, Plus, Settings } from 'lucide-react';
 import { Button } from './ui/button';
-
-interface Salon {
-  id: string;
-  name: string;
-  location: string;
-  plan: 'starter' | 'professional' | 'business';
-  image?: string;
-}
+import type { Salon } from '../../types/roles';
 
 interface SalonSwitcherProps {
   salons: Salon[];
@@ -41,7 +34,8 @@ export function SalonSwitcher({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const getPlanBadgeColor = (plan: string) => {
+  // Helper to get a plan badge color based on the salon plan
+  const getPlanBadgeColor = (plan?: string) => {
     switch (plan) {
       case 'business':
         return 'bg-gradient-to-r from-purple-600 to-pink-600';
@@ -50,7 +44,7 @@ export function SalonSwitcher({
       case 'starter':
         return 'bg-gray-400';
       default:
-        return 'bg-gray-400';
+        return 'bg-gradient-to-r from-purple-600 to-pink-600';
     }
   };
 
@@ -62,9 +56,9 @@ export function SalonSwitcher({
         className="flex items-center gap-3 px-4 py-2 bg-white rounded-lg border border-gray-200 hover:border-purple-300 transition-all shadow-sm min-w-[200px]"
       >
         <div className="flex items-center gap-3 flex-1">
-          {currentSalon?.image ? (
+          {currentSalon?.logo ? (
             <img
-              src={currentSalon.image}
+              src={currentSalon.logo}
               alt={currentSalon.name}
               className="w-8 h-8 rounded-lg object-cover"
             />
@@ -80,7 +74,7 @@ export function SalonSwitcher({
             </div>
             {currentSalon && (
               <div className="text-xs text-gray-500 truncate max-w-[150px]">
-                {currentSalon.location}
+                {currentSalon.address}
               </div>
             )}
           </div>
@@ -129,9 +123,9 @@ export function SalonSwitcher({
                   salon.id === currentSalonId ? 'bg-purple-50' : ''
                 }`}
               >
-                {salon.image ? (
+                {salon.logo ? (
                   <img
-                    src={salon.image}
+                    src={salon.logo}
                     alt={salon.name}
                     className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
                   />
@@ -150,31 +144,35 @@ export function SalonSwitcher({
                       <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
                     )}
                   </div>
-                  <div className="text-xs text-gray-600 truncate">{salon.location}</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-xs px-2 py-0.5 rounded-full text-white ${getPlanBadgeColor(salon.plan)}`}>
-                      {salon.plan.charAt(0).toUpperCase() + salon.plan.slice(1)}
-                    </span>
-                  </div>
+                  <div className="text-xs text-gray-600 truncate">{salon.address}</div>
+                  {salon.isPublished && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs px-2 py-0.5 rounded-full text-white bg-gradient-to-r from-purple-600 to-pink-600">
+                        Published
+                      </span>
+                    </div>
+                  )}
                 </div>
               </button>
             ))}
           </div>
 
           {/* Add New Button */}
-          <div className="border-t border-gray-200 p-3 bg-gray-50">
-            <Button
-              onClick={() => {
-                onAddNew();
-                setIsOpen(false);
-              }}
-              variant="outline"
-              className="w-full justify-center border-dashed border-2 border-purple-300 text-purple-600 hover:bg-purple-50 hover:border-purple-400"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Salon
-            </Button>
-          </div>
+          {onAddNew && (
+            <div className="border-t border-gray-200 p-3 bg-gray-50">
+              <Button
+                onClick={() => {
+                  onAddNew();
+                  setIsOpen(false);
+                }}
+                variant="outline"
+                className="w-full justify-center border-dashed border-2 border-purple-300 text-purple-600 hover:bg-purple-50 hover:border-purple-400"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Salon
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

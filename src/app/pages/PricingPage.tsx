@@ -649,25 +649,23 @@ export function PricingPage() {
       {selectedPlan && (
         <>
           <StripePaymentModal 
-            isOpen={isPaymentOpen} 
-            onClose={() => setIsPaymentOpen(false)}
-            planName={`${selectedPlan.name} - ${billingPeriod === 'monthly' ? 'Monthly' : billingPeriod === 'semi-annual' ? '6 Months' : 'Annual'}`}
-            price={calculatePrice(selectedPlan.id, billingPeriod).toString()}
-            currency={currency.code.toLowerCase()}
-            onPaymentSuccess={() => {
-              setIsPaymentOpen(false);
-              setIsOnboardingOpen(true);
-            }}
-            type="subscription"
-          />
-          <SalonOnboardingModal
-            isOpen={isOnboardingOpen}
-            onClose={() => setIsOnboardingOpen(false)}
-            subscription={{
-              planName: selectedPlan.name,
-              price: calculatePrice(selectedPlan.id, billingPeriod).toString(),
-              billingPeriod: billingPeriod
-            }}
+      isOpen={isPaymentOpen} 
+      onClose={() => setIsPaymentOpen(false)}
+      amount={calculatePrice(selectedPlan.id, billingPeriod)}
+      currency={currency.code}
+      description={`${selectedPlan.name} - ${billingPeriod === 'monthly' ? 'Monthly' : billingPeriod === 'semi-annual' ? '6 Months' : 'Annual'}`}
+      onPaymentSuccess={() => {
+        setIsPaymentOpen(false);
+        setIsOnboardingOpen(true);
+      }}
+    />
+    <SalonOnboardingModal
+      isOpen={isOnboardingOpen}
+      onClose={() => setIsOnboardingOpen(false)}
+      subscription={{
+        planName: selectedPlan.name,
+        price: calculatePrice(selectedPlan.id, billingPeriod).toString()
+      }}
           />
         </>
       )}

@@ -20,9 +20,14 @@ export interface Salon {
   address: string;
   phone: string;
   email: string;
+  description?: string;
   logo?: string;
+  cover?: string;
   photos: string[];
   ownerId: string;
+  plan?: 'starter' | 'professional' | 'business'; // Subscription plan
+  billingPeriod?: 'monthly' | 'semi-annual' | 'annual'; // Billing period
+  subscriptionStatus?: 'active' | 'trial' | 'expired'; // Subscription status
   services: Service[];
   staff: User[];
   isPublished?: boolean; // Whether salon is visible to clients
