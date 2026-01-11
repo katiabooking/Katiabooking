@@ -4,7 +4,7 @@ import { FeedAnalytics } from './FeedAnalytics';
 import type { User, UserRole, Salon, Booking, Client } from '../../types/roles';
 import { PERMISSIONS, hasPermission } from '../../types/roles';
 import { SalonSwitcher } from '../../../../src/app/components/SalonSwitcher';
-import { BarChart3, Bell, Brain, Camera, Clock, DollarSign, Gift, LogOut, MessageSquare, Package, RefreshCw, Scissors, Settings, Sparkles, Star, Store, Target, TrendingUp, UserPlus, Users, Zap } from 'lucide-react';
+import { BarChart3, Bell, Brain, Camera, Clock, DollarSign, Gift, ImageIcon, LogOut, MessageSquare, Package, RefreshCw, Scissors, Settings, Sparkles, Star, Store, Target, TrendingUp, UserPlus, Users, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../../../../src/app/components/ui/card';
 import { Calendar } from '../../../../src/app/components/ui/calendar';
 import { Button } from '../../../../src/app/components/ui/button';
@@ -14,6 +14,11 @@ import { PackageDealsTab } from '../../../../src/app/components/PackageDealsTab'
 import { DynamicPricingTab } from '../../../../src/app/components/DynamicPricingTab';
 import { ReferralProgramTab } from '../../../../src/app/components/ReferralProgramTab';
 import { AISmartFillingTab } from '../../../../src/app/components/AISmartFillingTab';
+import { AdvancedForecastingTab } from '../../../../src/app/components/AdvancedForecastingTab';
+import { BookingSettingsTab } from '../../../../src/app/components/BookingSettingsTab';
+import { GiftCardsTab } from '../../../../src/app/components/GiftCardsTab';
+import { MultiSalonManager } from '../../../../src/app/components/MultiSalonManager';
+import { InviteStaffModal } from '../../../../src/app/components/InviteStaffModal';
 
 interface SalonDashboardProps {
   currentUser: User;
